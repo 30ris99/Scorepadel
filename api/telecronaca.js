@@ -41,7 +41,6 @@ export default async function handler(req, res) {
 
     const safeSpeed = Math.max(0.75, Math.min(1.30, Number(speed) || 1.0));
 
-    // Filtro anti-allucinazioni su clip silenziose o con solo rumore
     function isSilenceHallucination(text) {
       const clean = text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").trim();
       if (clean.length < 3) return true;
@@ -58,7 +57,6 @@ export default async function handler(req, res) {
       return noisePatterns.some((re) => re.test(clean));
     }
 
-    // 1. Trascrizione SENZA prompt (evita che OpenAI copi la lista di parole sul silenzio)
     async function transcribeClip(clip) {
       if (!clip.rawAudioBase64) return null;
       const mime = (clip.rawAudioMime || "audio/webm").toLowerCase();
@@ -115,7 +113,6 @@ export default async function handler(req, res) {
       calmo: "Calmo, disteso e analitico."
     }[mood] || "Sobrio, asciutto e naturale.";
 
-    // 2. Riscrittura FEDELE: rifinisce solo ciò che dice il commentatore senza aggiungere altro
     const rewritePrompt = `Sei un editor di telecronaca TV di padel in italiano (${tournamentTitle}: ${team1} vs ${team2}).
 Ricevi una lista di appunti vocali ("rawText") dettati dal commentatore.
 
@@ -188,7 +185,6 @@ Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"..."
       ? "Impostazione vocale: timbro leggermente più grave e profondo."
       : (Number(pitchSemitones) >= 1.5 ? "Impostazione vocale: timbro leggermente più brillante e squillante." : "");
 
-    // 3. Generazione audio studio MP3 in parallelo con guida fonetica dei colpi di padel
     async function synthesizeClip(item) {
       const ttsInstructions = `${accentGuide}
 Stile: commentatore sportivo televisivo in cabina (stile Premier Padel), voce calda, viva e conversazionale, zero effetto robotico o da audiolibro.
