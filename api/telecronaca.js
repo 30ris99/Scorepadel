@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
     const safeSpeed = Math.max(0.75, Math.min(1.30, Number(speed) || 1.0));
 
-    // Prompt lessicale per Whisper/gpt-4o-mini-transcribe: evita errori su termini di padel
+    // Prompt lessicale per Whisper/gpt-4o-mini-transcribe
     const sttPadelPrompt = `Telecronaca di padel in italiano (${team1} vs ${team2}). Termini frequenti: per tre, x3, por tres, per quattro, x4, por cuatro, smash, remate, bandeja, vibora, chiquita, bajada, rulo, gancho, dormilona, dejada, globo, pallonetto, volee, volée, controvetro, contrapared, uscita di parete, salida de pared, doppio vetro, reja, griglia, porta, punto de oro, killer point, palla break, nevera, willy, tweener, cuchilla, boquilla.`;
 
     // 1. Trascrizione in parallelo con fallback automatico gpt-4o-mini-transcribe -> whisper-1
@@ -96,48 +96,33 @@ export default async function handler(req, res) {
     }
 
     const moodGuide = {
-      sobrio: "Sobrio, tecnico e giornalistico (stile Premier Padel / Sky Sport). Zero urla, zero falsi entusiasmi.",
-      dinamico: "Dinamico e ritmato da diretta TV, leggermente più vivo sui punti decisivi, ma sempre credibile e mai urlato.",
-      calmo: "Calmo, analitico e disteso, da commentatore tecnico di studio."
-    }[mood] || "Sobrio, tecnico e giornalistico.";
+      sobrio: "Sobrio, asciutto e naturale.",
+      dinamico: "Ritmato e scorrevole da diretta TV, senza mai urlare.",
+      calmo: "Calmo, disteso e analitico."
+    }[mood] || "Sobrio, asciutto e naturale.";
 
-    // 2. Riscrittura naturale con glossario completo dei colpi di padel
-    const rewritePrompt = `Sei un telecronista televisivo esperto di padel che commenta in italiano per una diretta stile Premier Padel.
-Ricevi una lista cronologica di appunti vocali registrati durante "${tournamentTitle}" (${team1} vs ${team2}).
+    // 2. Riscrittura FEDELE: pulisce e migliora leggermente senza aggiungere né togliere concetti
+    const rewritePrompt = `Sei un editor di telecronaca TV di padel in italiano (${tournamentTitle}: ${team1} vs ${team2}).
+Ricevi una lista di appunti vocali ("rawText") dettati dal commentatore.
 
-GLOSSARIO UFFICIALE PADEL (INTERPRETA SEMPRE CON PRECISIONE ASSOLUTA):
-- "per tre" / "x3" / "por tres" / "fuori per tre" = smash che esce lateralmente sopra la parete da 3 metri (NON significa MAI "tre punti" o "tre vincenti"!). Nel testo scrivi sempre "per tre" o "smash per tre" (mai "x3" che la voce leggerebbe male).
-- "per quattro" / "x4" / "por cuatro" = smash potente che scavalca il vetro di fondo da 4 metri. Scrivi sempre "per quattro" (mai "x4").
-- "bandeja" = colpo difensivo-tattico sopra la testa tagliato per mantenere la rete.
-- "víbora" = colpo sopra la testa più veloce e con forte effetto laterale/tagliato.
-- "rulo" / "rulo alla griglia" = smash liftato verso la griglia laterale (reja).
-- "gancho" = colpo sopra la testa alto e controllato di emergenza per non perdere la rete.
-- "bajada" / "bajada de pared" = attacco potente dopo il rimbalzo alto sul vetro di fondo.
-- "chiquita" = palla morbida e bassa giocata ai piedi degli avversari a rete.
-- "dormilona" = smorzata delicatissima dopo uno smash avversario che rimbalza sul vetro.
-- "dejada" / "smorzata" = palla corta a morire subito dopo la rete.
-- "globo" / "pallonetto" = palla alta sopra gli avversari per toglierli dalla rete.
-- "contrapared" / "controvetro" = colpo difensivo giocato contro il proprio vetro di fondo.
-- "salida de pared" / "uscita di parete" = colpo dopo il rimbalzo sul vetro di fondo o laterale.
-- "boquilla" / "doble pared" / "doppio vetro" = rimbalzo su entrambi i vetri d'angolo.
-- "reja" / "griglia" = la rete metallica laterale.
-- "recupero da fuori" / "uscita dalla porta" = giocatore che esce dalla porta laterale per recuperare un "per tre".
-- "willy" / "tweener" = colpo tra le gambe.
-- "nevera" / "frigorifero" = strategia di giocare tutte le palle su un solo avversario escludendo il compagno.
-- "punto de oro" / "killer point" = punto decisivo sul quaranta pari.
+COMPITO PRECISO (FEDELTÀ STRETTA):
+Devi solo RIPULIRE E RIFINIRE LEGGERMENTE la frase del commentatore per farla suonare fluida e professionale a voce, SENZA aggiungere altro e SENZA divagare.
+- ATTIENITI STRETTAMENTE a ciò che dice il commentatore in "rawText": non aggiungere commenti extra, non aggiungere valutazioni, non inventare dettagli, non allungare la frase.
+- NON aggiungere il punteggio se il commentatore non lo ha nominato; se lo ha nominato, assicurati solo che sia coerente con "scoreSnapshot" e scrivilo in lettere ("trenta a quindici", "quaranta pari").
+- NON togliere dettagli o colpi descritti dal commentatore: mantieni esattamente la sua descrizione, eliminando solo esitazioni ("ehm", "allora", "cioè", ripetizioni) e sistemando il ritmo con virgole o puntini ("...") per una lettura naturale.
+- Mantieni una lunghezza quasi identica alla frase originale.
+- Mood: ${moodGuide} ZERO falsi entusiasmi, ZERO punti esclamativi inutili.
+
+GLOSSARIO PADEL (NON FRAINTENDERE MAI):
+- "per tre" / "x3" / "por tres" = smash fuori lateralmente sopra la parete da 3 metri (scrivi sempre "per tre", mai "x3", e mai "tre vincenti").
+- "per quattro" / "x4" / "por cuatro" = smash fuori dal vetro di fondo da 4 metri (scrivi sempre "per quattro", mai "x4").
+- Mantieni fedeli tutti i termini tecnici usati: bandeja, víbora, chiquita, bajada, rulo, gancho, dormilona, dejada, globo, contrapared, salida de pared, boquilla, reja, willy, tweener, nevera, punto de oro.
 
 Per ogni intervento restituisci:
 - "id": ESATTAMENTE lo stesso id ricevuto in input
-- "text": frase in italiano PARLATO fluido, ritmato e naturale, coerente con gli interventi precedenti (linea narrativa unica).
-- "tone": breve indicazione di registro per la voce (es. "calmo e scorrevole", "attento e concentrato", "sobrio con leggera ammirazione").
+- "text": la frase leggermente rifinita, fedele al 100% a "rawText"
+- "tone": breve indicazione di registro coerente col mood (es. "calmo e scorrevole", "asciutto e attento")
 
-REGOLE DI SCRITTURA PER VOCE NATURALE:
-- Mood richiesto: ${moodGuide}
-- Scrivi come si PARLA in diretta TV, non come un articolo scritto.
-- Usa frasi brevi con pause naturali (virgole e puntini di sospensione "...").
-- Scrivi i punteggi in lettere quando suona più naturale ("trenta a quindici", "quaranta pari", "cinque a quattro").
-- Non scrivere simboli come "x3" o "x4": scrivi sempre "per tre" e "per quattro" così la pronuncia è perfetta.
-- Massimo 1-2 frasi per intervento, senza inventare colpi non menzionati.
 Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"...","tone":"..."}]}`;
 
     const chatResp = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -148,6 +133,7 @@ Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"..."
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
+        temperature: 0.3,
         response_format: { type: "json_object" },
         messages: [
           { role: "system", content: rewritePrompt },
