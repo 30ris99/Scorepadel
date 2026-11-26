@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/telecronaca.js": {
+      "maxDuration": 60
+    }
+  }
+}
