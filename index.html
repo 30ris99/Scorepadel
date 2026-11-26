@@ -490,23 +490,23 @@
                             </button>
 
                             <!-- Gruppo Destra: Highlight (H) + Microfono Push-to-Talk Centrato + Annulla (Z) -->
-                            <div class="sm:col-span-4 flex items-center justify-center gap-2.5">
+                            <div id="right-actions-grid" class="sm:col-span-4 grid grid-cols-2 items-center gap-2">
                                 <!-- Flag Highlight (H) -->
-                                <button type="button" id="btn-toggle-last-highlight" onclick="toggleLastPointHighlight()" class="flex-1 basis-0 self-stretch bg-sp-bg hover:bg-sp-elevated border border-amber-400/40 hover:border-amber-400 rounded p-2 text-amber-300 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Marca l'ultimo punto come Highlight automatico (tra punto precedente e attuale) [H]">
+                                <button type="button" id="btn-toggle-last-highlight" onclick="toggleLastPointHighlight()" class="w-full h-full min-h-[64px] bg-sp-bg hover:bg-sp-elevated border border-amber-400/40 hover:border-amber-400 rounded p-2 text-amber-300 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Marca l'ultimo punto come Highlight automatico (tra punto precedente e attuale) [H]">
                                     <span id="btn-last-hl-star" class="text-base leading-none">☆</span>
-                                    <span class="text-[10.5px] font-mono font-bold uppercase truncate">Highlight (H)</span>
+                                    <span class="text-[10px] font-mono font-bold uppercase truncate w-full text-center">Highlight (H)</span>
                                 </button>
 
-                                <!-- Pulsante Push-to-Talk Telecronaca AI (rotondo a microfono, centrato tra Highlight e Annulla) -->
-                                <div id="ptt-commentary-slot" class="hidden shrink-0 flex items-center justify-center">
+                                <!-- Pulsante Push-to-Talk (rotondo a microfono, centrato esattamente tra Highlight e Annulla) -->
+                                <div id="ptt-commentary-slot" class="hidden flex items-center justify-center px-0.5">
                                     <button type="button" id="btn-ptt-commentary"
                                         onpointerdown="handlePttPointerDown(event)"
                                         onpointerup="handlePttPointerUp(event)"
                                         onpointercancel="handlePttPointerUp(event)"
                                         oncontextmenu="return false;"
                                         style="touch-action: none;"
-                                        class="relative w-14 h-14 sm:w-[62px] sm:h-[62px] rounded-full bg-sp-bg hover:bg-sp-elevated border-2 border-sp-lime/80 hover:border-sp-lime text-sp-lime shadow-lg transition-all select-none flex flex-col items-center justify-center gap-0.5 active:scale-95"
-                                        title="Telecronaca AI: tieni premuto per parlare (oppure tieni premuto T)">
+                                        class="relative w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full bg-sp-bg hover:bg-sp-elevated border-2 border-sp-lime/80 hover:border-sp-lime text-sp-lime shadow-lg transition-all select-none flex flex-col items-center justify-center gap-0.5 active:scale-95"
+                                        title="Push-to-Talk: tieni premuto per parlare (oppure tieni premuto T)">
                                         <span id="ptt-pulse-ring" class="hidden absolute -inset-1 rounded-full border-2 border-rose-500 animate-ping pointer-events-none"></span>
                                         <i data-lucide="mic" class="w-5 h-5"></i>
                                         <span id="ptt-btn-label" class="text-[9px] font-mono font-extrabold uppercase leading-none">T</span>
@@ -514,9 +514,9 @@
                                 </div>
 
                                 <!-- Annulla ultimo (Z) -->
-                                <button type="button" onclick="undoLastPoint()" class="flex-1 basis-0 self-stretch bg-sp-bg hover:bg-sp-elevated border border-sp-border hover:border-rose-500/60 rounded p-2 text-sp-muted hover:text-rose-400 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Annulla ultimo punto (Z)">
+                                <button type="button" onclick="undoLastPoint()" class="w-full h-full min-h-[64px] bg-sp-bg hover:bg-sp-elevated border border-sp-border hover:border-rose-500/60 rounded p-2 text-sp-muted hover:text-rose-400 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Annulla ultimo punto (Z)">
                                     <i data-lucide="undo-2" class="w-4 h-4"></i>
-                                    <span class="text-[10.5px] font-mono font-bold uppercase truncate">Annulla (Z)</span>
+                                    <span class="text-[10px] font-mono font-bold uppercase truncate w-full text-center">Annulla (Z)</span>
                                 </button>
                             </div>
                         </div>
@@ -1106,6 +1106,45 @@
                                                 Nessun intervento registrato.<br>Tieni premuto il pulsante microfono <strong class="text-sp-lime">(T)</strong> per commentare uno scambio.
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FILTRO CABINA TV (OPZIONE A PARTE • ANCHE CON VOCE DIRETTA PUSH-TO-TALK) -->
+                            <div class="bg-sp-bg border border-sp-border rounded p-3 flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-mono font-bold uppercase text-sky-300 flex items-center gap-1.5">
+                                        <i data-lucide="radio" class="w-3.5 h-3.5"></i>
+                                        Filtro Cabina TV (Broadcast)
+                                    </span>
+                                    <input type="checkbox" id="tv-booth-filter-enabled" onchange="updateTvBoothFilterSettings()" class="w-4 h-4 accent-[#D4FF00] cursor-pointer" title="Attiva il Filtro Cabina TV e mostra il pulsante microfono Push-to-Talk">
+                                </div>
+
+                                <div id="tv-booth-filter-controls" class="hidden flex flex-col gap-2.5 pt-1.5 border-t border-sp-border">
+                                    <p class="text-[10.5px] text-sp-muted leading-snug">
+                                        Applica EQ da cuffia broadcast, compressione TV e micro-riverbero di cabina sia alle clip <strong class="text-sp-text">AI OpenAI</strong> sia alle tue note registrate direttamente con il microfono <strong class="text-sp-lime">(T)</strong>.
+                                    </p>
+
+                                    <div class="flex flex-col gap-1">
+                                        <label for="tv-booth-preset" class="text-[11px] font-semibold text-sp-text">Stile Microfono Broadcast</label>
+                                        <select id="tv-booth-preset" onchange="updateTvBoothFilterSettings()" class="w-full bg-sp-surface border border-sp-border rounded px-2.5 py-1.5 text-xs text-sp-text focus:outline-none focus:border-sp-lime">
+                                            <option value="cabina" selected>Cabina TV (Sky Sport / Premier Padel)</option>
+                                            <option value="bordocampo">Cuffia Bordo Campo (Diretta Live)</option>
+                                            <option value="studio">Studio Radio (Caldo e Compatto)</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between text-[11px] mb-0.5">
+                                            <span class="text-sp-muted">Intensità Effetto Cabina</span>
+                                            <span id="tv-booth-intensity-val" class="font-mono text-sp-lime font-bold tabular-nums">70%</span>
+                                        </div>
+                                        <input type="range" id="tv-booth-intensity" min="0" max="100" step="5" value="70" oninput="updateTvBoothFilterSettings()" class="w-full">
+                                    </div>
+
+                                    <div id="tv-booth-clips-summary" class="text-[10px] font-mono text-sp-muted flex items-center justify-between pt-1 border-t border-sp-border/60">
+                                        <span>Clip vocali attive: <strong id="tv-booth-clips-count" class="text-sp-text">0</strong></span>
+                                        <span class="text-sky-300">Attivo in Play & Export</span>
                                     </div>
                                 </div>
                             </div>
@@ -1768,7 +1807,10 @@
                 aiCommentaryPitch: 0,
                 aiCommentarySpeed: 1.0,
                 aiCommentaryVolume: 1.0,
-                aiCommentaryDuckingGain: 0.25
+                aiCommentaryDuckingGain: 0.25,
+                tvBoothFilterEnabled: false,
+                tvBoothPreset: 'cabina',
+                tvBoothIntensity: 70
             },
 
             // Interventi Telecronaca AI (OpenAI Push-to-Talk)
@@ -1840,7 +1882,98 @@
         let mediaElSource = null;
         let replayAudioGain = null;
         let aiCommentaryGain = null;
+        let aiBoothNodes = null;
         let audioDest = null;
+
+        function createBoothImpulseResponse(ctxObj, durationSec = 0.24, decay = 3.2) {
+            const sr = ctxObj.sampleRate || 48000;
+            const len = Math.max(1, Math.floor(sr * durationSec));
+            const impulse = ctxObj.createBuffer(2, len, sr);
+            for (let ch = 0; ch < 2; ch++) {
+                const data = impulse.getChannelData(ch);
+                for (let i = 0; i < len; i++) {
+                    const env = Math.pow(1 - i / len, decay);
+                    data[i] = (Math.random() * 2 - 1) * env * 0.45;
+                }
+            }
+            return impulse;
+        }
+
+        function buildTvBoothChain(ctxObj, inputNode, outputNode, enabled, preset, intensityPct) {
+            const dryGain = ctxObj.createGain();
+            const wetGain = ctxObj.createGain();
+
+            const hp = ctxObj.createBiquadFilter();
+            hp.type = 'highpass';
+
+            const boxCut = ctxObj.createBiquadFilter();
+            boxCut.type = 'peaking';
+            boxCut.frequency.value = 380;
+            boxCut.Q.value = 1.2;
+
+            const presence = ctxObj.createBiquadFilter();
+            presence.type = 'peaking';
+            presence.Q.value = 1.1;
+
+            const lp = ctxObj.createBiquadFilter();
+            lp.type = 'lowpass';
+
+            const comp = ctxObj.createDynamicsCompressor();
+            const reverb = ctxObj.createConvolver();
+            reverb.buffer = createBoothImpulseResponse(ctxObj, 0.22, 3.4);
+            const reverbGain = ctxObj.createGain();
+            const wetSum = ctxObj.createGain();
+
+            inputNode.connect(dryGain);
+            dryGain.connect(outputNode);
+
+            inputNode.connect(hp);
+            hp.connect(boxCut);
+            boxCut.connect(presence);
+            presence.connect(lp);
+            lp.connect(comp);
+            comp.connect(wetSum);
+            comp.connect(reverb);
+            reverb.connect(reverbGain);
+            reverbGain.connect(wetSum);
+            wetSum.connect(wetGain);
+            wetGain.connect(outputNode);
+
+            const nodes = { dryGain, wetGain, hp, boxCut, presence, lp, comp, reverbGain };
+            applyTvBoothParamsToNodes(ctxObj, nodes, enabled, preset, intensityPct);
+            return nodes;
+        }
+
+        function applyTvBoothParamsToNodes(ctxObj, nodes, enabled, preset, intensityPct) {
+            if (!nodes) return;
+            const mix = enabled ? Math.max(0, Math.min(1, (Number(intensityPct) || 0) / 100)) : 0;
+            const nowT = ctxObj ? ctxObj.currentTime : 0;
+
+            const cfg = {
+                cabina:     { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.8, thresh: -22, ratio: 4.5, rev: 0.14 },
+                bordocampo: { hp: 185, lp: 5600, cutDb: -3.5, presHz: 2400, presDb: 5.0, thresh: -24, ratio: 6.0, rev: 0.22 },
+                studio:     { hp: 95,  lp: 9200, cutDb: -1.8, presHz: 3100, presDb: 2.6, thresh: -18, ratio: 3.5, rev: 0.08 }
+            }[preset] || { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.8, thresh: -22, ratio: 4.5, rev: 0.14 };
+
+            try {
+                nodes.hp.frequency.setValueAtTime(cfg.hp, nowT);
+                nodes.lp.frequency.setValueAtTime(cfg.lp, nowT);
+                nodes.boxCut.gain.setValueAtTime(cfg.cutDb, nowT);
+                nodes.presence.frequency.setValueAtTime(cfg.presHz, nowT);
+                nodes.presence.gain.setValueAtTime(cfg.presDb, nowT);
+                nodes.comp.threshold.setValueAtTime(cfg.thresh, nowT);
+                nodes.comp.knee.setValueAtTime(14, nowT);
+                nodes.comp.ratio.setValueAtTime(cfg.ratio, nowT);
+                nodes.comp.attack.setValueAtTime(0.005, nowT);
+                nodes.comp.release.setValueAtTime(0.14, nowT);
+                nodes.reverbGain.gain.setValueAtTime(cfg.rev * mix, nowT);
+                nodes.dryGain.gain.setValueAtTime(1.0 - mix, nowT);
+                nodes.wetGain.gain.setValueAtTime(mix * 1.12, nowT);
+            } catch (_) {
+                nodes.dryGain.gain.value = 1.0 - mix;
+                nodes.wetGain.gain.value = mix * 1.12;
+            }
+        }
 
         function ensureAudioPipeline() {
             try {
@@ -1851,8 +1984,19 @@
                     audioDest = audioCtx.createMediaStreamDestination();
                     aiCommentaryGain = audioCtx.createGain();
                     aiCommentaryGain.gain.value = state.settings.aiCommentaryVolume ?? 1.0;
-                    aiCommentaryGain.connect(audioCtx.destination);
-                    aiCommentaryGain.connect(audioDest);
+
+                    const aiOutBus = audioCtx.createGain();
+                    aiOutBus.gain.value = 1.0;
+                    aiBoothNodes = buildTvBoothChain(
+                        audioCtx,
+                        aiCommentaryGain,
+                        aiOutBus,
+                        Boolean(state.settings.tvBoothFilterEnabled),
+                        state.settings.tvBoothPreset || 'cabina',
+                        state.settings.tvBoothIntensity ?? 70
+                    );
+                    aiOutBus.connect(audioCtx.destination);
+                    aiOutBus.connect(audioDest);
                 }
                 if (state.mode === 'video' && !mediaElSource) {
                     mediaElSource = audioCtx.createMediaElementSource(videoEl);
@@ -2004,16 +2148,45 @@
             }
         }
 
+        function isPttMicAvailable() {
+            return Boolean(state.settings.aiCommentaryEnabled || state.settings.tvBoothFilterEnabled);
+        }
+
         function syncAiCommentaryUI() {
             const s = state.settings;
-            const enabled = Boolean(s.aiCommentaryEnabled);
+            const aiOn = Boolean(s.aiCommentaryEnabled);
+            const boothOn = Boolean(s.tvBoothFilterEnabled);
+            const micVisible = aiOn || boothOn;
+
             const controlsEl = document.getElementById('ai-commentary-controls');
+            const boothControlsEl = document.getElementById('tv-booth-filter-controls');
             const pttSlot = document.getElementById('ptt-commentary-slot');
+            const rightGrid = document.getElementById('right-actions-grid');
             const kbdHint = document.getElementById('ptt-kbd-hint');
 
-            if (controlsEl) controlsEl.classList.toggle('hidden', !enabled);
-            if (pttSlot) pttSlot.classList.toggle('hidden', !enabled);
-            if (kbdHint) kbdHint.classList.toggle('hidden', !enabled);
+            if (controlsEl) controlsEl.classList.toggle('hidden', !aiOn);
+            if (boothControlsEl) boothControlsEl.classList.toggle('hidden', !boothOn);
+            if (pttSlot) pttSlot.classList.toggle('hidden', !micVisible);
+            if (kbdHint) kbdHint.classList.toggle('hidden', !micVisible);
+
+            if (rightGrid) {
+                if (micVisible) {
+                    rightGrid.classList.remove('grid-cols-2');
+                    rightGrid.classList.add('grid-cols-[1fr_auto_1fr]');
+                } else {
+                    rightGrid.classList.remove('grid-cols-[1fr_auto_1fr]');
+                    rightGrid.classList.add('grid-cols-2');
+                }
+            }
+
+            const boothVal = document.getElementById('tv-booth-intensity-val');
+            if (boothVal) boothVal.textContent = `${Math.round(s.tvBoothIntensity ?? 70)}%`;
+            const boothClipsCnt = document.getElementById('tv-booth-clips-count');
+            if (boothClipsCnt) boothClipsCnt.textContent = String((state.aiCommentaryClips || []).length);
+
+            if (aiBoothNodes && audioCtx) {
+                applyTvBoothParamsToNodes(audioCtx, aiBoothNodes, boothOn, s.tvBoothPreset || 'cabina', s.tvBoothIntensity ?? 70);
+            }
 
             const pitch = Number(s.aiCommentaryPitch || 0);
             const pitchVal = document.getElementById('ai-commentary-pitch-val');
@@ -2056,11 +2229,29 @@
             if (volEl) state.settings.aiCommentaryVolume = Math.max(0.20, Math.min(1.50, parseFloat(volEl.value) || 1.0));
             if (duckEl) state.settings.aiCommentaryDuckingGain = Math.max(0.0, Math.min(1.0, parseFloat(duckEl.value) || 0.25));
 
-            if (!state.settings.aiCommentaryEnabled) {
+            if (!isPttMicAvailable()) {
                 stopPttRecording(true);
                 stopAiCommentaryPlayback();
             }
             applyAudioGain();
+            syncAiCommentaryUI();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        function updateTvBoothFilterSettings() {
+            if (state.isExporting) return;
+            const enEl = document.getElementById('tv-booth-filter-enabled');
+            const preEl = document.getElementById('tv-booth-preset');
+            const intEl = document.getElementById('tv-booth-intensity');
+
+            state.settings.tvBoothFilterEnabled = Boolean(enEl && enEl.checked);
+            if (preEl) state.settings.tvBoothPreset = preEl.value || 'cabina';
+            if (intEl) state.settings.tvBoothIntensity = Math.max(0, Math.min(100, parseFloat(intEl.value) || 0));
+
+            if (!isPttMicAvailable()) {
+                stopPttRecording(true);
+                stopAiCommentaryPlayback();
+            }
             syncAiCommentaryUI();
             if (window.lucide) window.lucide.createIcons();
         }
@@ -2151,7 +2342,7 @@
         }
 
         async function startPttRecording() {
-            if (!state.settings.aiCommentaryEnabled || state.isExporting || state.mode === 'landing') return;
+            if (!isPttMicAvailable() || state.isExporting || state.mode === 'landing') return;
             if (!isVideoPlayable()) {
                 showToast('Carica prima un video valido oppure usa il Video Demo.', 'error');
                 return;
@@ -2356,13 +2547,14 @@
         }
 
         function checkAiCommentaryPlaybackFrame(currTime) {
-            if (!state.settings.aiCommentaryEnabled) return;
+            if (!isPttMicAvailable()) return;
             if (state.isExporting && state.greenScreenMode) return;
             if (!state.isPlaying || state.replayEngine.phase !== 'LIVE') {
                 aiCommRuntime.lastCheckTime = currTime;
                 return;
             }
-            const readyClips = state.aiCommentaryClips.filter(c => c.processedAudioBase64);
+            const allowRawPlayback = Boolean(state.settings.tvBoothFilterEnabled);
+            const readyClips = state.aiCommentaryClips.filter(c => c.processedAudioBase64 || (allowRawPlayback && c.rawAudioBase64));
             if (readyClips.length === 0) {
                 aiCommRuntime.lastCheckTime = currTime;
                 return;
@@ -2376,7 +2568,7 @@
                 if (aiCommRuntime.playedInPass.has(clip.id)) continue;
                 if (currTime >= clip.timestamp && prevT <= clip.timestamp + 0.35 && (currTime - clip.timestamp) < 1.0) {
                     aiCommRuntime.playedInPass.add(clip.id);
-                    playAiCommentaryClip(clip, true);
+                    playAiCommentaryClip(clip, Boolean(clip.processedAudioBase64));
                     break;
                 }
             }
@@ -2529,6 +2721,8 @@
             const readyCount = clips.filter(c => c.processedAudioBase64).length;
 
             if (countEl) countEl.textContent = String(clips.length);
+            const boothCntEl = document.getElementById('tv-booth-clips-count');
+            if (boothCntEl) boothCntEl.textContent = String(clips.length);
             if (readyBadge) {
                 readyBadge.textContent = `${readyCount}/${clips.length} AI pronti`;
                 readyBadge.className = readyCount > 0 && readyCount === clips.length
@@ -5097,7 +5291,7 @@
             } else if (key === 'h') {
                 e.preventDefault();
                 if (!e.repeat) toggleLastPointHighlight();
-            } else if (key === 't' && state.settings.aiCommentaryEnabled) {
+            } else if (key === 't' && isPttMicAvailable()) {
                 e.preventDefault();
                 if (!e.repeat && !aiCommRuntime.keyTHeld) {
                     aiCommRuntime.keyTHeld = true;
@@ -7363,18 +7557,31 @@
             let decoderModeLabel = '';
             let passthroughAudio = null;
             let audioBuffer = null;
-            const readyAiCommClips = (!greenScreen && state.settings.aiCommentaryEnabled)
-                ? state.aiCommentaryClips.filter(c => c.processedAudioBase64).sort((a, b) => a.timestamp - b.timestamp)
+            const readyAiCommClips = (!greenScreen && isPttMicAvailable())
+                ? state.aiCommentaryClips.filter(c => c.processedAudioBase64 || (state.settings.tvBoothFilterEnabled && c.rawAudioBase64)).sort((a, b) => a.timestamp - b.timestamp)
                 : [];
             const decodedAiCommClips = [];
             if (readyAiCommClips.length > 0 && typeof AudioEncoder !== 'undefined' && typeof AudioData !== 'undefined') {
-                document.getElementById('export-eta').textContent = 'Decodifica tracce Telecronaca AI...';
+                document.getElementById('export-eta').textContent = 'Preparazione tracce Telecronaca / Filtro Cabina TV...';
                 for (const clip of readyAiCommClips) {
                     try {
-                        const buf = await getDecodedAudioBufferForClip(clip, true);
+                        let buf = await getDecodedAudioBufferForClip(clip, Boolean(clip.processedAudioBase64));
+                        if (buf && state.settings.tvBoothFilterEnabled && (state.settings.tvBoothIntensity ?? 70) > 0 && typeof OfflineAudioContext !== 'undefined') {
+                            try {
+                                const offLen = Math.ceil((buf.duration + 0.30) * buf.sampleRate);
+                                const offCtx = new OfflineAudioContext(Math.min(2, buf.numberOfChannels), offLen, buf.sampleRate);
+                                const srcNode = offCtx.createBufferSource();
+                                srcNode.buffer = buf;
+                                buildTvBoothChain(offCtx, srcNode, offCtx.destination, true, state.settings.tvBoothPreset || 'cabina', state.settings.tvBoothIntensity ?? 70);
+                                srcNode.start(0);
+                                buf = await offCtx.startRendering();
+                            } catch (fErr) {
+                                console.warn('Filtro Cabina TV offline non applicato, uso clip originale:', fErr);
+                            }
+                        }
                         if (buf) decodedAiCommClips.push({ clip, buffer: buf });
                     } catch (e) {
-                        console.warn('Clip AI non decodificabile per export:', e);
+                        console.warn('Clip audio non decodificabile per export:', e);
                     }
                 }
             }
@@ -8310,7 +8517,7 @@
                 activeExportTracksToStop.push(...canvasVideoTracks);
                 const tracks = [...canvasVideoTracks];
 
-                const hasReadyAiComm = Boolean(state.settings.aiCommentaryEnabled && state.aiCommentaryClips.some(c => c.processedAudioBase64));
+                const hasReadyAiComm = Boolean(isPttMicAvailable() && state.aiCommentaryClips.some(c => c.processedAudioBase64 || (state.settings.tvBoothFilterEnabled && c.rawAudioBase64)));
                 if (hasReadyAiComm && !greenScreen) {
                     await ensureAudioPipeline();
                     resetAiCommentaryPlaybackCursor(startT);
@@ -10334,7 +10541,7 @@
             if (state.isExporting) return;
             const payload = {
                 app: 'SCOREPADEL',
-                version: 36,
+                version: 37,
                 savedAt: new Date().toISOString(),
                 settings: state.settings,
                 replayDuration: state.replayDuration,
@@ -10428,7 +10635,11 @@
                     setVal('ai-commentary-speed', Number(state.settings.aiCommentarySpeed || 1.0).toFixed(2));
                     setVal('ai-commentary-volume', Number(state.settings.aiCommentaryVolume ?? 1.0).toFixed(2));
                     setVal('ai-commentary-ducking', Number(state.settings.aiCommentaryDuckingGain ?? 0.25).toFixed(2));
+                    setChk('tv-booth-filter-enabled', state.settings.tvBoothFilterEnabled);
+                    setVal('tv-booth-preset', state.settings.tvBoothPreset || 'cabina');
+                    setVal('tv-booth-intensity', Number(state.settings.tvBoothIntensity ?? 70));
                     updateAiCommentarySettings();
+                    updateTvBoothFilterSettings();
                     renderAiCommentaryClipsList();
 
                     // Bandiere, foto giocatori e logo canale
