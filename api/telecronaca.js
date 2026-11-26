@@ -79,20 +79,23 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Nessun parlato rilevato nelle clip registrate" });
     }
 
-    // 2. Riscrittura naturale da telecronaca TV parlata (zero effetto robotico / zero falsi entusiasmi)
-    const rewritePrompt = `Sei un telecronista sportivo televisivo italiano di padel (stile Sky Sport / commento tecnico naturale).
+    // 2. Riscrittura naturale da telecronaca TV padel (mood spagnolo/Premier Padel in italiano)
+    const rewritePrompt = `Sei un telecronista televisivo di padel di origine spagnola che commenta in italiano per una diretta stile Premier Padel.
 Ricevi una lista cronologica di appunti vocali registrati durante "${tournamentTitle}" (${team1} vs ${team2}).
-Per ogni intervento restituisci:
-- "id": ESATTAMENTE lo stesso campo id ricevuto in input
-- "text": la frase riscritta in italiano PARLATO naturale, fluido e spontaneo, coerente con gli interventi precedenti (linea narrativa unica).
-- "tone": breve indicazione di registro per la voce (es. "rilassato e scorrevole", "attento e concentrato", "sobrio con leggera ammirazione").
 
-REGOLE PER EVITARE L'EFFETTO ROBOTICO:
-- Scrivi come si PARLA in diretta TV, non come un articolo di giornale.
-- Usa frasi brevi e ritmate, con pause naturali tramite virgole e puntini di sospensione (es. "Forza troppo la volée Luca... palla in rete. Trenta a quaranta, palla break.").
-- Scrivi i punteggi come si pronunciano a voce quando suona piu naturale (es. "trenta a quindici", "quaranta pari", "due a uno").
-- ZERO falsi entusiasmi, ZERO punti esclamativi inutili, ZERO frasi urlate o teatrali.
-- Non inventare colpi non menzionati e mantieni ogni intervento breve (1-2 frasi).
+Per ogni intervento restituisci:
+- "id": ESATTAMENTE lo stesso id ricevuto in input
+- "text": frase in italiano PARLATO fluido, ritmato e naturale, coerente con gli interventi precedenti (linea narrativa unica).
+- "tone": breve indicazione di mood per la voce (es. "calmo e scorrevole", "ritmo leggermente serrato, attento", "sobrio con ammirazione trattenuta").
+
+MOOD E STILE:
+- Tono da commentatore tecnico di padel: competente, caldo, spontaneo, con quel ritmo musicale tipico delle telecronache spagnole ma senza mai urlare.
+- Usa frasi brevi e naturali da diretta, con pause vere usando virgole e puntini di sospensione (es. "Che mano morbida sulla chiquita... apre il campo, e chiude di volée. Trenta a quindici.").
+- Puoi usare i termini autentici del padel (bandeja, víbora, chiquita, bajada, globo, salida de pared) quando coerenti con l'appunto.
+- Scrivi i punteggi come si dicono a voce ("trenta a quaranta", "quaranta pari", "cinque a quattro").
+- ZERO falsi entusiasmi, ZERO punti esclamativi inutili, ZERO tono da spot o audiolibro.
+- Massimo 1-2 frasi per intervento, senza inventare colpi non menzionati.
+
 Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"...","tone":"..."}]}`;
 
     const chatResp = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -123,7 +126,7 @@ Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"..."
       .map((item, idx) => ({
         id: (item && validIds.has(item.id)) ? item.id : (analyzed[idx]?.id || item?.id),
         text: String(item?.text || analyzed[idx]?.rawText || "").trim(),
-        tone: String(item?.tone || "rilassato e scorrevole").trim()
+        tone: String(item?.tone || "calmo e scorrevole").trim()
       }))
       .filter(item => item.id && item.text);
 
@@ -131,12 +134,13 @@ Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"..."
       return res.status(500).json({ error: "OpenAI ha restituito una riscrittura vuota" });
     }
 
-    // 3. Generazione audio studio MP3 in parallelo (gpt-4o-mini-tts con istruzioni naturali -> fallback tts-1)
+    // 3. Generazione audio studio MP3 in parallelo (accento spagnolo leggero + mood naturale)
     async function synthesizeClip(item) {
-      const ttsInstructions = `Parla in italiano naturale come un telecronista sportivo televisivo in cabina (stile Sky Sport, non un audiolibro e non una voce robotica).
-Cadenza: naturale e scorrevole, con respiri e micro-pause reali sui puntini e sulle virgole.
-Registro di questo intervento: ${item.tone}.
-Mantieni un tono sobrio, caldo e autentico, senza mai urlare o risultare artificiale.`;
+      const ttsInstructions = `Parla in italiano con un leggero e autentico accento spagnolo (come un telecronista spagnolo di padel che parla italiano in modo fluente e naturale, mai caricaturale o forzato).
+Stile: commentatore sportivo televisivo in cabina (stile Premier Padel / Sky Sport), voce calda, viva e conversazionale, zero effetto robotico o da audiolibro.
+Ritmo: scorrevole e leggermente musicale, con micro-pause e respiri naturali sui puntini e sulle virgole. Pronuncia con accento spagnolo autentico i termini del padel (bandeja, víbora, chiquita, bajada, globo).
+Mood di questo intervento: ${item.tone}.
+Resta sempre sobrio e credibile: niente urla, niente entusiasmo finto.`;
 
       let ttsResp = await fetch("https://api.openai.com/v1/audio/speech", {
         method: "POST",
