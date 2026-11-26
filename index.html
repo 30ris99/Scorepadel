@@ -687,24 +687,27 @@
                 <div class="lg:col-span-4 flex flex-col gap-3">
                     <div class="bg-sp-surface border border-sp-border rounded-lg flex flex-col">
 
-                        <!-- Barra 6 Tab -->
-                        <div class="grid grid-cols-6 border-b border-sp-border bg-sp-bg rounded-t-lg">
-                            <button type="button" id="tab-btn-players" onclick="switchSideTab('players')" class="py-2.5 text-[9.5px] font-mono font-bold uppercase tracking-tight text-sp-lime border-b-2 border-sp-lime flex items-center justify-center">
+                        <!-- Barra 7 Tab -->
+                        <div class="grid grid-cols-7 border-b border-sp-border bg-sp-bg rounded-t-lg">
+                            <button type="button" id="tab-btn-players" onclick="switchSideTab('players')" class="py-2.5 text-[9px] font-mono font-bold uppercase tracking-tight text-sp-lime border-b-2 border-sp-lime flex items-center justify-center">
                                 <span>Regole</span>
                             </button>
-                            <button type="button" id="tab-btn-timeline" onclick="switchSideTab('timeline')" class="py-2.5 text-[9.5px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
+                            <button type="button" id="tab-btn-timeline" onclick="switchSideTab('timeline')" class="py-2.5 text-[9px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
                                 <span>Punti(<span id="events-count">0</span>)</span>
                             </button>
-                            <button type="button" id="tab-btn-replays" onclick="switchSideTab('replays')" class="py-2.5 text-[9.5px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
+                            <button type="button" id="tab-btn-replays" onclick="switchSideTab('replays')" class="py-2.5 text-[9px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
                                 <span>Replay(<span id="replays-count">0</span>)</span>
                             </button>
-                            <button type="button" id="tab-btn-highlights" onclick="switchSideTab('highlights')" class="py-2.5 text-[9.5px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
+                            <button type="button" id="tab-btn-highlights" onclick="switchSideTab('highlights')" class="py-2.5 text-[9px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
                                 <span>★(<span id="highlights-count">0</span>)</span>
                             </button>
-                            <button type="button" id="tab-btn-stats" onclick="switchSideTab('stats')" class="py-2.5 text-[9.5px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
+                            <button type="button" id="tab-btn-cabina" onclick="switchSideTab('cabina')" class="py-2.5 text-[9px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
+                                <span>Cabina(<span id="cabina-tab-count">0</span>)</span>
+                            </button>
+                            <button type="button" id="tab-btn-stats" onclick="switchSideTab('stats')" class="py-2.5 text-[9px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
                                 <span>Stats</span>
                             </button>
-                            <button type="button" id="tab-btn-export" onclick="switchSideTab('export')" class="py-2.5 text-[9.5px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
+                            <button type="button" id="tab-btn-export" onclick="switchSideTab('export')" class="py-2.5 text-[9px] font-mono font-bold uppercase tracking-tight text-sp-muted hover:text-sp-text flex items-center justify-center">
                                 <span>Esporta</span>
                             </button>
                         </div>
@@ -1110,44 +1113,6 @@
                                 </div>
                             </div>
 
-                            <!-- FILTRO CABINA TV (OPZIONE A PARTE • ANCHE CON VOCE DIRETTA PUSH-TO-TALK) -->
-                            <div class="bg-sp-bg border border-sp-border rounded p-3 flex flex-col gap-2.5">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[11px] font-mono font-bold uppercase text-sky-300 flex items-center gap-1.5">
-                                        <i data-lucide="radio" class="w-3.5 h-3.5"></i>
-                                        Filtro Cabina TV (Broadcast)
-                                    </span>
-                                    <input type="checkbox" id="tv-booth-filter-enabled" onchange="updateTvBoothFilterSettings()" class="w-4 h-4 accent-[#D4FF00] cursor-pointer" title="Attiva il Filtro Cabina TV e mostra il pulsante microfono Push-to-Talk">
-                                </div>
-
-                                <div id="tv-booth-filter-controls" class="hidden flex flex-col gap-2.5 pt-1.5 border-t border-sp-border">
-                                    <p class="text-[10.5px] text-sp-muted leading-snug">
-                                        Applica EQ da cuffia broadcast, compressione TV e micro-riverbero di cabina sia alle clip <strong class="text-sp-text">AI OpenAI</strong> sia alle tue note registrate direttamente con il microfono <strong class="text-sp-lime">(T)</strong>.
-                                    </p>
-
-                                    <div class="flex flex-col gap-1">
-                                        <label for="tv-booth-preset" class="text-[11px] font-semibold text-sp-text">Stile Microfono Broadcast</label>
-                                        <select id="tv-booth-preset" onchange="updateTvBoothFilterSettings()" class="w-full bg-sp-surface border border-sp-border rounded px-2.5 py-1.5 text-xs text-sp-text focus:outline-none focus:border-sp-lime">
-                                            <option value="cabina" selected>Cabina TV (Sky Sport / Premier Padel)</option>
-                                            <option value="bordocampo">Cuffia Bordo Campo (Diretta Live)</option>
-                                            <option value="studio">Studio Radio (Caldo e Compatto)</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <div class="flex justify-between text-[11px] mb-0.5">
-                                            <span class="text-sp-muted">Intensità Effetto Cabina</span>
-                                            <span id="tv-booth-intensity-val" class="font-mono text-sp-lime font-bold tabular-nums">70%</span>
-                                        </div>
-                                        <input type="range" id="tv-booth-intensity" min="0" max="100" step="5" value="70" oninput="updateTvBoothFilterSettings()" class="w-full">
-                                    </div>
-
-                                    <div id="tv-booth-clips-summary" class="text-[10px] font-mono text-sp-muted flex items-center justify-between pt-1 border-t border-sp-border/60">
-                                        <span>Clip vocali attive: <strong id="tv-booth-clips-count" class="text-sp-text">0</strong></span>
-                                        <span class="text-sky-300">Attivo in Play & Export</span>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <!-- TAB 2: TIMELINE PUNTI -->
@@ -1209,6 +1174,87 @@
                             <div id="highlights-list" class="flex-1 overflow-y-auto flex flex-col gap-2 pr-1 min-h-[260px] max-h-[540px]">
                                 <div class="text-center py-10 px-4 border border-dashed border-sp-border rounded text-sp-muted text-xs">
                                     Nessun highlight selezionato.<br>Dopo un punto spettacolare clicca <strong class="text-amber-300">★ Highlight [H]</strong> oppure la stella nella lista Punti.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 3C: CABINA TV (VOCE DIRETTA DIGITALE, SEPARATA DALL'AI) -->
+                        <div id="tab-cabina" class="hidden p-4 flex flex-col gap-3 max-h-[780px]">
+                            <div class="bg-sp-bg border border-sp-border rounded p-3 flex flex-col gap-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-mono font-bold uppercase text-sky-300 flex items-center gap-1.5">
+                                        <i data-lucide="radio" class="w-3.5 h-3.5"></i>
+                                        Cabina TV (Voce Diretta Digitale)
+                                    </span>
+                                    <input type="checkbox" id="cabina-enabled" onchange="updateCabinaSettings()" class="w-4 h-4 accent-[#38BDF8] cursor-pointer" title="Attiva Cabina TV: mostra il microfono Push-to-Talk e registra la tua voce qui">
+                                </div>
+
+                                <p class="text-[10.5px] text-sp-muted leading-snug">
+                                    Separata al 100% dall'AI (gratis e offline). Attivala per far comparire il microfono <strong class="text-sky-300">Push-to-Talk (T)</strong>, registrare la tua voce e modificarla digitalmente con filtro cabina TV, pitch e auto-ducking.
+                                </p>
+
+                                <div id="cabina-controls" class="hidden flex flex-col gap-2.5 pt-2 border-t border-sp-border">
+                                    <div class="flex flex-col gap-1">
+                                        <label for="cabina-preset" class="text-[11px] font-semibold text-sp-text">Stile Microfono Broadcast</label>
+                                        <select id="cabina-preset" onchange="updateCabinaSettings()" class="w-full bg-sp-surface border border-sp-border rounded px-2.5 py-1.5 text-xs text-sp-text focus:outline-none focus:border-sky-400">
+                                            <option value="cabina" selected>Cabina TV (Sky Sport / Premier Padel)</option>
+                                            <option value="bordocampo">Cuffia Bordo Campo (Diretta Live)</option>
+                                            <option value="studio">Studio Radio (Caldo e Compatto)</option>
+                                            <option value="profonda">Voce Profonda TV (Telecronista)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="flex flex-col gap-2 border-t border-sp-border pt-2">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-[10px] font-mono uppercase tracking-wider text-sp-muted">Elaborazione Digitale & Mix</span>
+                                            <button type="button" onclick="resetCabinaParams()" class="text-[10px] font-mono text-sky-300 hover:underline">Reset</button>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-[11px] mb-0.5">
+                                                <span class="text-sp-muted">Intensità Effetto Cabina</span>
+                                                <span id="cabina-intensity-val" class="font-mono text-sky-300 font-bold tabular-nums">75%</span>
+                                            </div>
+                                            <input type="range" id="cabina-intensity" min="0" max="100" step="5" value="75" oninput="updateCabinaSettings()" class="w-full">
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-[11px] mb-0.5">
+                                                <span class="text-sp-muted">Pitch / Timbro Digitale</span>
+                                                <span id="cabina-pitch-val" class="font-mono text-sky-300 font-bold tabular-nums">0 st</span>
+                                            </div>
+                                            <input type="range" id="cabina-pitch" min="-4" max="4" step="0.5" value="0" oninput="updateCabinaSettings()" class="w-full">
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-[11px] mb-0.5">
+                                                <span class="text-sp-muted">Volume Voce Cabina</span>
+                                                <span id="cabina-volume-val" class="font-mono text-sky-300 font-bold tabular-nums">110%</span>
+                                            </div>
+                                            <input type="range" id="cabina-volume" min="0.20" max="1.60" step="0.05" value="1.10" oninput="updateCabinaSettings()" class="w-full">
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-[11px] mb-0.5">
+                                                <span class="text-sp-muted">Audio campo mentre parli (Ducking)</span>
+                                                <span id="cabina-ducking-val" class="font-mono text-sky-300 font-bold tabular-nums">25%</span>
+                                            </div>
+                                            <input type="range" id="cabina-ducking" min="0.00" max="1.00" step="0.05" value="0.25" oninput="updateCabinaSettings()" class="w-full">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs text-sp-muted">
+                                <span>Registrazioni Cabina (<strong id="cabina-clips-count" class="text-sky-300">0</strong>)</span>
+                                <button type="button" onclick="clearAllCabinaClips()" class="text-rose-400 hover:text-rose-300 font-mono text-[11px] uppercase font-bold transition">
+                                    Svuota Cabina
+                                </button>
+                            </div>
+
+                            <div id="cabina-clips-list" class="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1 min-h-[200px] max-h-[420px]">
+                                <div class="text-center py-8 px-3 border border-dashed border-sp-border rounded text-sp-muted text-xs">
+                                    Nessuna registrazione in Cabina.<br>Attiva <strong class="text-sky-300">Cabina TV</strong> sopra e tieni premuto il microfono rotondo <strong class="text-sky-300">(T)</strong> per registrare la tua voce.
                                 </div>
                             </div>
                         </div>
@@ -1808,13 +1854,19 @@
                 aiCommentarySpeed: 1.0,
                 aiCommentaryVolume: 1.0,
                 aiCommentaryDuckingGain: 0.25,
-                tvBoothFilterEnabled: false,
-                tvBoothPreset: 'cabina',
-                tvBoothIntensity: 70
+                cabinaEnabled: false,
+                cabinaPreset: 'cabina',
+                cabinaIntensity: 75,
+                cabinaPitch: 0,
+                cabinaVolume: 1.10,
+                cabinaDuckingGain: 0.25
             },
 
             // Interventi Telecronaca AI (OpenAI Push-to-Talk)
             aiCommentaryClips: [],
+
+            // Registrazioni dirette Cabina TV (Digitale offline, separate dall'AI)
+            cabinaClips: [],
 
             // Asset locali caricati (foto giocatori + logo canale)
             playerPhotos: { p1: null, p2: null, p3: null, p4: null },
@@ -1882,7 +1934,8 @@
         let mediaElSource = null;
         let replayAudioGain = null;
         let aiCommentaryGain = null;
-        let aiBoothNodes = null;
+        let cabinaVoiceGain = null;
+        let cabinaBoothNodes = null;
         let audioDest = null;
 
         function createBoothImpulseResponse(ctxObj, durationSec = 0.24, decay = 3.2) {
@@ -1952,7 +2005,8 @@
             const cfg = {
                 cabina:     { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.8, thresh: -22, ratio: 4.5, rev: 0.14 },
                 bordocampo: { hp: 185, lp: 5600, cutDb: -3.5, presHz: 2400, presDb: 5.0, thresh: -24, ratio: 6.0, rev: 0.22 },
-                studio:     { hp: 95,  lp: 9200, cutDb: -1.8, presHz: 3100, presDb: 2.6, thresh: -18, ratio: 3.5, rev: 0.08 }
+                studio:     { hp: 95,  lp: 9200, cutDb: -1.8, presHz: 3100, presDb: 2.6, thresh: -18, ratio: 3.5, rev: 0.08 },
+                profonda:   { hp: 80,  lp: 6400, cutDb: 2.2,  presHz: 2500, presDb: 3.2, thresh: -24, ratio: 5.5, rev: 0.12 }
             }[preset] || { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.8, thresh: -22, ratio: 4.5, rev: 0.14 };
 
             try {
@@ -1982,21 +2036,28 @@
                 if (!audioCtx) {
                     audioCtx = new AC();
                     audioDest = audioCtx.createMediaStreamDestination();
+
+                    // Bus 1: Telecronaca AI (pulito, senza filtro cabina)
                     aiCommentaryGain = audioCtx.createGain();
                     aiCommentaryGain.gain.value = state.settings.aiCommentaryVolume ?? 1.0;
+                    aiCommentaryGain.connect(audioCtx.destination);
+                    aiCommentaryGain.connect(audioDest);
 
-                    const aiOutBus = audioCtx.createGain();
-                    aiOutBus.gain.value = 1.0;
-                    aiBoothNodes = buildTvBoothChain(
+                    // Bus 2: Cabina TV (voce diretta con catena digitale broadcast)
+                    cabinaVoiceGain = audioCtx.createGain();
+                    cabinaVoiceGain.gain.value = state.settings.cabinaVolume ?? 1.10;
+                    const cabinaOutBus = audioCtx.createGain();
+                    cabinaOutBus.gain.value = 1.0;
+                    cabinaBoothNodes = buildTvBoothChain(
                         audioCtx,
-                        aiCommentaryGain,
-                        aiOutBus,
-                        Boolean(state.settings.tvBoothFilterEnabled),
-                        state.settings.tvBoothPreset || 'cabina',
-                        state.settings.tvBoothIntensity ?? 70
+                        cabinaVoiceGain,
+                        cabinaOutBus,
+                        true,
+                        state.settings.cabinaPreset || 'cabina',
+                        state.settings.cabinaIntensity ?? 75
                     );
-                    aiOutBus.connect(audioCtx.destination);
-                    aiOutBus.connect(audioDest);
+                    cabinaOutBus.connect(audioCtx.destination);
+                    cabinaOutBus.connect(audioDest);
                 }
                 if (state.mode === 'video' && !mediaElSource) {
                     mediaElSource = audioCtx.createMediaElementSource(videoEl);
@@ -2020,6 +2081,13 @@
 
         let commentaryDuckingActive = false;
 
+        function getActiveDuckingLevel() {
+            if (state.settings.cabinaEnabled) {
+                return typeof state.settings.cabinaDuckingGain === 'number' ? state.settings.cabinaDuckingGain : 0.25;
+            }
+            return typeof state.settings.aiCommentaryDuckingGain === 'number' ? state.settings.aiCommentaryDuckingGain : 0.25;
+        }
+
         function applyAudioGain() {
             if (aiCommentaryGain && audioCtx) {
                 const aiVol = (state.isExporting && state.greenScreenMode) ? 0.0 : (state.settings.aiCommentaryVolume ?? 1.0);
@@ -2029,9 +2097,17 @@
                     aiCommentaryGain.gain.value = aiVol;
                 }
             }
+            if (cabinaVoiceGain && audioCtx) {
+                const cabVol = (state.isExporting && state.greenScreenMode) ? 0.0 : (state.settings.cabinaVolume ?? 1.10);
+                try {
+                    cabinaVoiceGain.gain.setTargetAtTime(cabVol, audioCtx.currentTime, 0.03);
+                } catch (_) {
+                    cabinaVoiceGain.gain.value = cabVol;
+                }
+            }
             if (state.mode !== 'video') return;
             const isMuted = Boolean(videoEl.muted || (state.isExporting && state.greenScreenMode));
-            const duckLevel = typeof state.settings.aiCommentaryDuckingGain === 'number' ? state.settings.aiCommentaryDuckingGain : 0.25;
+            const duckLevel = getActiveDuckingLevel();
             const targetGain = isMuted ? 0.0 : (commentaryDuckingActive ? duckLevel : 1.0);
             if (replayAudioGain && audioCtx) {
                 try {
@@ -2047,7 +2123,7 @@
             const effectiveMuted = Boolean(muted || (state.isExporting && state.greenScreenMode));
             videoEl.muted = effectiveMuted;
             if (replayAudioGain && audioCtx) {
-                const duckLevel = typeof state.settings.aiCommentaryDuckingGain === 'number' ? state.settings.aiCommentaryDuckingGain : 0.25;
+                const duckLevel = getActiveDuckingLevel();
                 const targetGain = effectiveMuted ? 0.0 : (commentaryDuckingActive ? duckLevel : 1.0);
                 try {
                     replayAudioGain.gain.setValueAtTime(targetGain, audioCtx.currentTime);
@@ -2149,23 +2225,23 @@
         }
 
         function isPttMicAvailable() {
-            return Boolean(state.settings.aiCommentaryEnabled || state.settings.tvBoothFilterEnabled);
+            return Boolean(state.settings.aiCommentaryEnabled || state.settings.cabinaEnabled);
         }
 
         function syncAiCommentaryUI() {
             const s = state.settings;
             const aiOn = Boolean(s.aiCommentaryEnabled);
-            const boothOn = Boolean(s.tvBoothFilterEnabled);
-            const micVisible = aiOn || boothOn;
+            const cabOn = Boolean(s.cabinaEnabled);
+            const micVisible = aiOn || cabOn;
 
             const controlsEl = document.getElementById('ai-commentary-controls');
-            const boothControlsEl = document.getElementById('tv-booth-filter-controls');
+            const cabControlsEl = document.getElementById('cabina-controls');
             const pttSlot = document.getElementById('ptt-commentary-slot');
             const rightGrid = document.getElementById('right-actions-grid');
             const kbdHint = document.getElementById('ptt-kbd-hint');
 
             if (controlsEl) controlsEl.classList.toggle('hidden', !aiOn);
-            if (boothControlsEl) boothControlsEl.classList.toggle('hidden', !boothOn);
+            if (cabControlsEl) cabControlsEl.classList.toggle('hidden', !cabOn);
             if (pttSlot) pttSlot.classList.toggle('hidden', !micVisible);
             if (kbdHint) kbdHint.classList.toggle('hidden', !micVisible);
 
@@ -2179,15 +2255,11 @@
                 }
             }
 
-            const boothVal = document.getElementById('tv-booth-intensity-val');
-            if (boothVal) boothVal.textContent = `${Math.round(s.tvBoothIntensity ?? 70)}%`;
-            const boothClipsCnt = document.getElementById('tv-booth-clips-count');
-            if (boothClipsCnt) boothClipsCnt.textContent = String((state.aiCommentaryClips || []).length);
-
-            if (aiBoothNodes && audioCtx) {
-                applyTvBoothParamsToNodes(audioCtx, aiBoothNodes, boothOn, s.tvBoothPreset || 'cabina', s.tvBoothIntensity ?? 70);
+            if (!aiCommRuntime.isRecording) {
+                updatePttButtonVisual(false);
             }
 
+            // Labels AI
             const pitch = Number(s.aiCommentaryPitch || 0);
             const pitchVal = document.getElementById('ai-commentary-pitch-val');
             if (pitchVal) pitchVal.textContent = `${pitch > 0 ? '+' : ''}${pitch.toFixed(1).replace('.0', '')} st`;
@@ -2197,6 +2269,21 @@
             if (volVal) volVal.textContent = `${Math.round((s.aiCommentaryVolume ?? 1.0) * 100)}%`;
             const duckVal = document.getElementById('ai-commentary-ducking-val');
             if (duckVal) duckVal.textContent = `${Math.round((s.aiCommentaryDuckingGain ?? 0.25) * 100)}%`;
+
+            // Labels Cabina TV
+            const cabIntVal = document.getElementById('cabina-intensity-val');
+            if (cabIntVal) cabIntVal.textContent = `${Math.round(s.cabinaIntensity ?? 75)}%`;
+            const cabPitch = Number(s.cabinaPitch || 0);
+            const cabPitchVal = document.getElementById('cabina-pitch-val');
+            if (cabPitchVal) cabPitchVal.textContent = `${cabPitch > 0 ? '+' : ''}${cabPitch.toFixed(1).replace('.0', '')} st`;
+            const cabVolVal = document.getElementById('cabina-volume-val');
+            if (cabVolVal) cabVolVal.textContent = `${Math.round((s.cabinaVolume ?? 1.10) * 100)}%`;
+            const cabDuckVal = document.getElementById('cabina-ducking-val');
+            if (cabDuckVal) cabDuckVal.textContent = `${Math.round((s.cabinaDuckingGain ?? 0.25) * 100)}%`;
+
+            if (cabinaBoothNodes && audioCtx) {
+                applyTvBoothParamsToNodes(audioCtx, cabinaBoothNodes, true, s.cabinaPreset || 'cabina', s.cabinaIntensity ?? 75);
+            }
         }
 
         function resetAiVoiceParams() {
@@ -2207,6 +2294,17 @@
             setV('ai-commentary-volume', '1.00');
             setV('ai-commentary-ducking', '0.25');
             updateAiCommentarySettings();
+        }
+
+        function resetCabinaParams() {
+            if (state.isExporting) return;
+            const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = String(v); };
+            setV('cabina-preset', 'cabina');
+            setV('cabina-intensity', 75);
+            setV('cabina-pitch', 0);
+            setV('cabina-volume', '1.10');
+            setV('cabina-ducking', '0.25');
+            updateCabinaSettings();
         }
 
         function updateAiCommentarySettings() {
@@ -2220,7 +2318,16 @@
             const volEl = document.getElementById('ai-commentary-volume');
             const duckEl = document.getElementById('ai-commentary-ducking');
 
-            state.settings.aiCommentaryEnabled = Boolean(enabledEl && enabledEl.checked);
+            const nextAi = Boolean(enabledEl && enabledEl.checked);
+            state.settings.aiCommentaryEnabled = nextAi;
+            // Mutualmente esclusivo con Cabina TV: se attivi AI spegne Cabina TV
+            if (nextAi && state.settings.cabinaEnabled) {
+                state.settings.cabinaEnabled = false;
+                const cabEl = document.getElementById('cabina-enabled');
+                if (cabEl) cabEl.checked = false;
+                stopAiCommentaryPlayback();
+            }
+
             if (voiceEl) state.settings.aiCommentaryVoice = voiceEl.value || 'ash';
             if (accentEl) state.settings.aiCommentaryAccent = accentEl.value || 'spagnolo_leggero';
             if (moodEl) state.settings.aiCommentaryMood = moodEl.value || 'sobrio';
@@ -2238,20 +2345,36 @@
             if (window.lucide) window.lucide.createIcons();
         }
 
-        function updateTvBoothFilterSettings() {
+        function updateCabinaSettings() {
             if (state.isExporting) return;
-            const enEl = document.getElementById('tv-booth-filter-enabled');
-            const preEl = document.getElementById('tv-booth-preset');
-            const intEl = document.getElementById('tv-booth-intensity');
+            const enEl = document.getElementById('cabina-enabled');
+            const preEl = document.getElementById('cabina-preset');
+            const intEl = document.getElementById('cabina-intensity');
+            const pitchEl = document.getElementById('cabina-pitch');
+            const volEl = document.getElementById('cabina-volume');
+            const duckEl = document.getElementById('cabina-ducking');
 
-            state.settings.tvBoothFilterEnabled = Boolean(enEl && enEl.checked);
-            if (preEl) state.settings.tvBoothPreset = preEl.value || 'cabina';
-            if (intEl) state.settings.tvBoothIntensity = Math.max(0, Math.min(100, parseFloat(intEl.value) || 0));
+            const nextCab = Boolean(enEl && enEl.checked);
+            state.settings.cabinaEnabled = nextCab;
+            // Mutualmente esclusivo con Telecronaca AI: se attivi Cabina TV spegne AI
+            if (nextCab && state.settings.aiCommentaryEnabled) {
+                state.settings.aiCommentaryEnabled = false;
+                const aiEl = document.getElementById('ai-commentary-enabled');
+                if (aiEl) aiEl.checked = false;
+                stopAiCommentaryPlayback();
+            }
+
+            if (preEl) state.settings.cabinaPreset = preEl.value || 'cabina';
+            if (intEl) state.settings.cabinaIntensity = Math.max(0, Math.min(100, parseFloat(intEl.value) || 0));
+            if (pitchEl) state.settings.cabinaPitch = Math.max(-4, Math.min(4, parseFloat(pitchEl.value) || 0));
+            if (volEl) state.settings.cabinaVolume = Math.max(0.20, Math.min(1.60, parseFloat(volEl.value) || 1.10));
+            if (duckEl) state.settings.cabinaDuckingGain = Math.max(0.0, Math.min(1.0, parseFloat(duckEl.value) || 0.25));
 
             if (!isPttMicAvailable()) {
                 stopPttRecording(true);
                 stopAiCommentaryPlayback();
             }
+            applyAudioGain();
             syncAiCommentaryUI();
             if (window.lucide) window.lucide.createIcons();
         }
@@ -2290,17 +2413,28 @@
             const lbl = document.getElementById('ptt-btn-label');
             const pill = document.getElementById('ptt-rec-pill');
             if (!btn) return;
+            const isCab = Boolean(state.settings.cabinaEnabled);
+            btn.classList.remove(
+                'bg-rose-600', 'border-rose-300', 'text-white', 'scale-105',
+                'bg-sp-bg', 'hover:bg-sp-elevated',
+                'border-sp-lime/80', 'border-sp-lime/70', 'hover:border-sp-lime', 'text-sp-lime',
+                'border-sky-400/80', 'hover:border-sky-300', 'text-sky-300'
+            );
             if (recording) {
-                btn.classList.remove('bg-sp-bg', 'hover:bg-sp-elevated', 'border-sp-lime/70', 'hover:border-sp-lime', 'text-sp-lime');
                 btn.classList.add('bg-rose-600', 'border-rose-300', 'text-white', 'scale-105');
                 if (ring) ring.classList.remove('hidden');
                 if (lbl) lbl.textContent = 'REC';
                 if (pill) pill.classList.remove('hidden');
             } else {
-                btn.classList.remove('bg-rose-600', 'border-rose-300', 'text-white', 'scale-105');
-                btn.classList.add('bg-sp-bg', 'hover:bg-sp-elevated', 'border-sp-lime/70', 'hover:border-sp-lime', 'text-sp-lime');
+                btn.classList.add('bg-sp-bg', 'hover:bg-sp-elevated');
+                if (isCab) {
+                    btn.classList.add('border-sky-400/80', 'hover:border-sky-300', 'text-sky-300');
+                    if (lbl) lbl.textContent = 'TV';
+                } else {
+                    btn.classList.add('border-sp-lime/80', 'hover:border-sp-lime', 'text-sp-lime');
+                    if (lbl) lbl.textContent = 'AI';
+                }
                 if (ring) ring.classList.add('hidden');
-                if (lbl) lbl.textContent = 'T';
                 if (pill) pill.classList.add('hidden');
             }
         }
@@ -2416,24 +2550,40 @@
                     try {
                         const blob = new Blob(chunks, { type: mime });
                         const b64 = await blobToBase64(blob);
-                        const clip = {
-                            id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now() + Math.random()),
-                            timestamp: aiCommRuntime.recTimestamp,
-                            scoreSnapshot: aiCommRuntime.recScoreSnapshot,
-                            rawAudioBase64: b64,
-                            rawAudioMime: mime,
-                            duration: durSec,
-                            text: '',
-                            tone: '',
-                            processedAudioBase64: null,
-                            processedAudioMime: 'audio/mpeg',
-                            status: 'raw'
-                        };
-                        state.aiCommentaryClips.push(clip);
-                        state.aiCommentaryClips.sort((a, b) => a.timestamp - b.timestamp);
-                        renderAiCommentaryClipsList();
-                        renderEventsList();
-                        showToast(`Nota vocale salvata @ ${formatClock(clip.timestamp)} (${durSec}s)`, 'success');
+                        if (state.settings.cabinaEnabled) {
+                            const cabClip = {
+                                id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now() + Math.random()),
+                                timestamp: aiCommRuntime.recTimestamp,
+                                scoreSnapshot: aiCommRuntime.recScoreSnapshot,
+                                rawAudioBase64: b64,
+                                rawAudioMime: mime,
+                                duration: durSec
+                            };
+                            state.cabinaClips.push(cabClip);
+                            state.cabinaClips.sort((a, b) => a.timestamp - b.timestamp);
+                            renderCabinaClipsList();
+                            renderEventsList();
+                            showToast(`Cabina TV: voce registrata @ ${formatClock(cabClip.timestamp)} (${durSec}s)`, 'success');
+                        } else {
+                            const clip = {
+                                id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now() + Math.random()),
+                                timestamp: aiCommRuntime.recTimestamp,
+                                scoreSnapshot: aiCommRuntime.recScoreSnapshot,
+                                rawAudioBase64: b64,
+                                rawAudioMime: mime,
+                                duration: durSec,
+                                text: '',
+                                tone: '',
+                                processedAudioBase64: null,
+                                processedAudioMime: 'audio/mpeg',
+                                status: 'raw'
+                            };
+                            state.aiCommentaryClips.push(clip);
+                            state.aiCommentaryClips.sort((a, b) => a.timestamp - b.timestamp);
+                            renderAiCommentaryClipsList();
+                            renderEventsList();
+                            showToast(`Nota vocale AI salvata @ ${formatClock(clip.timestamp)} (${durSec}s)`, 'success');
+                        }
                     } catch (err) {
                         console.error('Errore salvataggio nota vocale:', err);
                         showToast('Errore nel salvataggio della nota vocale.', 'error');
@@ -2485,7 +2635,10 @@
             stopAiCommentaryPlayback();
             aiCommRuntime.playedInPass.clear();
             aiCommRuntime.lastCheckTime = t;
-            state.aiCommentaryClips.forEach(c => {
+            (state.aiCommentaryClips || []).forEach(c => {
+                if (c.timestamp < t - 0.15) aiCommRuntime.playedInPass.add(c.id);
+            });
+            (state.cabinaClips || []).forEach(c => {
                 if (c.timestamp < t - 0.15) aiCommRuntime.playedInPass.add(c.id);
             });
         }
@@ -2540,7 +2693,47 @@
                 };
                 src.start(0);
             } catch (err) {
-                console.warn('Errore riproduzione clip telecronaca:', err);
+                console.warn('Errore riproduzione clip telecronaca AI:', err);
+                commentaryDuckingActive = false;
+                applyAudioGain();
+            }
+        }
+
+        async function playCabinaClip(clip) {
+            if (!clip || !clip.rawAudioBase64) return;
+            try {
+                stopAiCommentaryPlayback();
+                const buffer = await getDecodedAudioBufferForClip(clip, false);
+                if (!buffer || !audioCtx || !cabinaVoiceGain) return;
+
+                if (cabinaBoothNodes) {
+                    applyTvBoothParamsToNodes(audioCtx, cabinaBoothNodes, true, state.settings.cabinaPreset || 'cabina', state.settings.cabinaIntensity ?? 75);
+                }
+
+                const src = audioCtx.createBufferSource();
+                src.buffer = buffer;
+                const pitchSemi = Number(state.settings.cabinaPitch || 0);
+                if (pitchSemi !== 0 && src.detune) {
+                    src.detune.value = pitchSemi * 100;
+                }
+                src.connect(cabinaVoiceGain);
+                aiCommRuntime.activeSourceNode = src;
+                aiCommRuntime.activeClipId = clip.id;
+
+                commentaryDuckingActive = true;
+                applyAudioGain();
+
+                src.onended = () => {
+                    if (aiCommRuntime.activeSourceNode === src) {
+                        aiCommRuntime.activeSourceNode = null;
+                        aiCommRuntime.activeClipId = null;
+                        commentaryDuckingActive = false;
+                        applyAudioGain();
+                    }
+                };
+                src.start(0);
+            } catch (err) {
+                console.warn('Errore riproduzione clip Cabina TV:', err);
                 commentaryDuckingActive = false;
                 applyAudioGain();
             }
@@ -2553,8 +2746,10 @@
                 aiCommRuntime.lastCheckTime = currTime;
                 return;
             }
-            const allowRawPlayback = Boolean(state.settings.tvBoothFilterEnabled);
-            const readyClips = state.aiCommentaryClips.filter(c => c.processedAudioBase64 || (allowRawPlayback && c.rawAudioBase64));
+            const isCab = Boolean(state.settings.cabinaEnabled);
+            const readyClips = isCab
+                ? (state.cabinaClips || []).filter(c => c.rawAudioBase64)
+                : (state.aiCommentaryClips || []).filter(c => c.processedAudioBase64);
             if (readyClips.length === 0) {
                 aiCommRuntime.lastCheckTime = currTime;
                 return;
@@ -2568,11 +2763,111 @@
                 if (aiCommRuntime.playedInPass.has(clip.id)) continue;
                 if (currTime >= clip.timestamp && prevT <= clip.timestamp + 0.35 && (currTime - clip.timestamp) < 1.0) {
                     aiCommRuntime.playedInPass.add(clip.id);
-                    playAiCommentaryClip(clip, Boolean(clip.processedAudioBase64));
+                    if (isCab) playCabinaClip(clip);
+                    else playAiCommentaryClip(clip, true);
                     break;
                 }
             }
             aiCommRuntime.lastCheckTime = currTime;
+        }
+
+        function nudgeCabinaClipTime(id, delta) {
+            if (state.isExporting) return;
+            const clip = state.cabinaClips.find(c => c.id === id);
+            if (!clip) return;
+            clip.timestamp = Number(Math.max(0, Math.min(state.videoDuration, clip.timestamp + delta)).toFixed(2));
+            state.cabinaClips.sort((a, b) => a.timestamp - b.timestamp);
+            renderCabinaClipsList();
+            renderEventsList();
+        }
+
+        function deleteCabinaClipById(id) {
+            if (state.isExporting) return;
+            if (aiCommRuntime.activeClipId === id) stopAiCommentaryPlayback();
+            state.cabinaClips = state.cabinaClips.filter(c => c.id !== id);
+            aiCommRuntime.bufferCache.delete(`${id}_raw`);
+            renderCabinaClipsList();
+            renderEventsList();
+        }
+
+        function clearAllCabinaClips() {
+            if (state.isExporting || state.cabinaClips.length === 0) return;
+            stopAiCommentaryPlayback();
+            state.cabinaClips = [];
+            renderCabinaClipsList();
+            renderEventsList();
+            showToast('Registrazioni Cabina TV eliminate.', 'info');
+        }
+
+        function previewCabinaClipById(id) {
+            const clip = state.cabinaClips.find(c => c.id === id);
+            if (!clip) return;
+            if (aiCommRuntime.activeClipId === id) {
+                stopAiCommentaryPlayback();
+                return;
+            }
+            playCabinaClip(clip);
+        }
+
+        function jumpToCabinaClip(id) {
+            if (state.isExporting || !isVideoPlayable()) return;
+            const clip = state.cabinaClips.find(c => c.id === id);
+            if (!clip) return;
+            abortActiveReplay();
+            resetConsumedReplaysAfter(clip.timestamp);
+            seekTo(clip.timestamp);
+            resetAiCommentaryPlaybackCursor(clip.timestamp);
+        }
+
+        function renderCabinaClipsList() {
+            const listEl = document.getElementById('cabina-clips-list');
+            const countEl = document.getElementById('cabina-clips-count');
+            const tabCntEl = document.getElementById('cabina-tab-count');
+            const clips = state.cabinaClips || [];
+
+            if (countEl) countEl.textContent = String(clips.length);
+            if (tabCntEl) tabCntEl.textContent = String(clips.length);
+            if (!listEl) return;
+
+            if (clips.length === 0) {
+                listEl.innerHTML = `
+                    <div class="text-center py-8 px-3 border border-dashed border-sp-border rounded text-sp-muted text-xs">
+                        Nessuna registrazione in Cabina.<br>Attiva <strong class="text-sky-300">Cabina TV</strong> sopra e tieni premuto il microfono rotondo <strong class="text-sky-300">(T)</strong> per registrare la tua voce.
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = '';
+            clips.forEach((c, idx) => {
+                const row = document.createElement('div');
+                row.className = 'bg-sp-bg border border-sp-border hover:border-sky-400/40 rounded p-2.5 flex flex-col gap-1.5 transition';
+                row.innerHTML = `
+                    <div class="flex items-center justify-between gap-1.5">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <button type="button" onclick="jumpToCabinaClip('${c.id}')" class="text-[10.5px] font-mono text-sky-300 bg-sp-surface px-1.5 py-0.5 border border-sky-500/40 rounded-sm hover:border-sky-300 tabular-nums shrink-0" title="Vai a questo secondo">
+                                ${formatClock(c.timestamp, true)}
+                            </button>
+                            <span class="text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded-sm uppercase shrink-0 bg-sky-500/15 text-sky-300 border border-sky-400/35">
+                                Cabina #${idx + 1} (${c.duration || 0}s)
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="previewCabinaClipById('${c.id}')" class="p-1 bg-sp-surface hover:bg-sp-elevated text-sky-300 border border-sp-border rounded transition" title="Ascolta con Filtro Cabina TV">
+                                <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                            </button>
+                            <button type="button" onclick="nudgeCabinaClipTime('${c.id}', -0.5)" class="px-1 py-0.5 text-[9.5px] font-mono bg-sp-surface hover:bg-sp-elevated text-sp-muted hover:text-sp-text border border-sp-border rounded transition" title="Anticipa 0.5s">-0.5</button>
+                            <button type="button" onclick="nudgeCabinaClipTime('${c.id}', 0.5)" class="px-1 py-0.5 text-[9.5px] font-mono bg-sp-surface hover:bg-sp-elevated text-sp-muted hover:text-sp-text border border-sp-border rounded transition" title="Posticipa 0.5s">+0.5</button>
+                            <button type="button" onclick="deleteCabinaClipById('${c.id}')" class="p-1 text-sp-muted hover:text-rose-400 transition" title="Elimina registrazione">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-[10px] font-mono text-sp-muted truncate">${escapeHtml(c.scoreSnapshot || 'Voce registrata in Cabina TV')}</div>
+                `;
+                listEl.appendChild(row);
+            });
+            if (window.lucide) window.lucide.createIcons();
         }
 
         async function processAiCommentaryClips() {
@@ -2721,8 +3016,6 @@
             const readyCount = clips.filter(c => c.processedAudioBase64).length;
 
             if (countEl) countEl.textContent = String(clips.length);
-            const boothCntEl = document.getElementById('tv-booth-clips-count');
-            if (boothCntEl) boothCntEl.textContent = String(clips.length);
             if (readyBadge) {
                 readyBadge.textContent = `${readyCount}/${clips.length} AI pronti`;
                 readyBadge.className = readyCount > 0 && readyCount === clips.length
@@ -3054,9 +3347,11 @@
             state.timelineIntelCard = null;
             state.replays = [];
             state.aiCommentaryClips = [];
+            state.cabinaClips = [];
             aiCommRuntime.bufferCache.clear();
             aiCommRuntime.playedInPass.clear();
             renderAiCommentaryClipsList();
+            renderCabinaClipsList();
             invalidateTimelineCache();
             state.replayEngine.lastLiveTime = 0;
             state.replayEngine.consumedIds.clear();
@@ -3392,9 +3687,11 @@
                 state.timelineIntelCard = null;
                 state.replays = [];
                 state.aiCommentaryClips = [];
+                state.cabinaClips = [];
                 aiCommRuntime.bufferCache.clear();
                 aiCommRuntime.playedInPass.clear();
                 renderAiCommentaryClipsList();
+                renderCabinaClipsList();
                 invalidateTimelineCache();
                 document.getElementById('download-ready-banner').classList.add('hidden');
             }
@@ -3460,9 +3757,11 @@
             state.timelineIntelCard = null;
             state.replays = [];
             state.aiCommentaryClips = [];
+            state.cabinaClips = [];
             aiCommRuntime.bufferCache.clear();
             aiCommRuntime.playedInPass.clear();
             renderAiCommentaryClipsList();
+            renderCabinaClipsList();
             invalidateTimelineCache();
             state.replayEngine.lastLiveTime = 0;
             state.replayEngine.consumedIds.clear();
@@ -4961,11 +5260,20 @@
                 markersEl.appendChild(rMark);
             });
 
-            // Marker Telecronaca AI sulla timeline (azzurro / ambra)
+            // Marker Telecronaca AI sulla timeline (lime / ambra)
             (state.aiCommentaryClips || []).forEach(c => {
                 const pct = Math.min(100, Math.max(0, (c.timestamp / Math.max(1, state.videoDuration)) * 100));
                 const cMark = document.createElement('div');
-                cMark.className = `absolute -translate-x-1/2 w-2 h-3 -top-0.5 rounded-full ${c.processedAudioBase64 ? 'bg-sky-400' : 'bg-amber-400'} border border-sp-bg`;
+                cMark.className = `absolute -translate-x-1/2 w-2 h-3 -top-0.5 rounded-full ${c.processedAudioBase64 ? 'bg-sp-lime' : 'bg-amber-400'} border border-sp-bg`;
+                cMark.style.left = `${pct}%`;
+                markersEl.appendChild(cMark);
+            });
+
+            // Marker Cabina TV sulla timeline (azzurro)
+            (state.cabinaClips || []).forEach(c => {
+                const pct = Math.min(100, Math.max(0, (c.timestamp / Math.max(1, state.videoDuration)) * 100));
+                const cMark = document.createElement('div');
+                cMark.className = 'absolute -translate-x-1/2 w-2 h-3 -top-0.5 rounded-full bg-sky-400 border border-sp-bg';
                 cMark.style.left = `${pct}%`;
                 markersEl.appendChild(cMark);
             });
@@ -5238,7 +5546,7 @@
         }
 
         function switchSideTab(tab) {
-            const tabs = ['players', 'timeline', 'replays', 'highlights', 'stats', 'export'];
+            const tabs = ['players', 'timeline', 'replays', 'highlights', 'cabina', 'stats', 'export'];
             tabs.forEach(t => {
                 const panel = document.getElementById(`tab-${t}`);
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -6344,6 +6652,7 @@
             'tab-btn-timeline',
             'tab-btn-replays',
             'tab-btn-highlights',
+            'tab-btn-cabina',
             'tab-btn-stats',
             'tab-btn-export'
         ]);
@@ -6361,7 +6670,7 @@
                 el.classList.toggle('opacity-50', disabled && el.id !== 'hud-tournament-title');
                 el.classList.toggle('cursor-not-allowed', disabled);
             });
-            document.querySelectorAll('#events-list > div, #replays-list > div, #highlights-list > div').forEach(row => {
+            document.querySelectorAll('#events-list > div, #replays-list > div, #highlights-list > div, #cabina-clips-list > div').forEach(row => {
                 row.classList.toggle('pointer-events-none', disabled);
                 row.classList.toggle('opacity-60', disabled);
             });
@@ -7557,22 +7866,26 @@
             let decoderModeLabel = '';
             let passthroughAudio = null;
             let audioBuffer = null;
-            const readyAiCommClips = (!greenScreen && isPttMicAvailable())
-                ? state.aiCommentaryClips.filter(c => c.processedAudioBase64 || (state.settings.tvBoothFilterEnabled && c.rawAudioBase64)).sort((a, b) => a.timestamp - b.timestamp)
-                : [];
+            const exportUseCabina = Boolean(!greenScreen && state.settings.cabinaEnabled);
+            const exportUseAi = Boolean(!greenScreen && !exportUseCabina && state.settings.aiCommentaryEnabled);
+            const readyVoiceClips = exportUseCabina
+                ? (state.cabinaClips || []).filter(c => c.rawAudioBase64).sort((a, b) => a.timestamp - b.timestamp)
+                : (exportUseAi ? (state.aiCommentaryClips || []).filter(c => c.processedAudioBase64).sort((a, b) => a.timestamp - b.timestamp) : []);
             const decodedAiCommClips = [];
-            if (readyAiCommClips.length > 0 && typeof AudioEncoder !== 'undefined' && typeof AudioData !== 'undefined') {
-                document.getElementById('export-eta').textContent = 'Preparazione tracce Telecronaca / Filtro Cabina TV...';
-                for (const clip of readyAiCommClips) {
+            if (readyVoiceClips.length > 0 && typeof AudioEncoder !== 'undefined' && typeof AudioData !== 'undefined') {
+                document.getElementById('export-eta').textContent = exportUseCabina
+                    ? 'Applicazione Filtro Cabina TV offline...'
+                    : 'Decodifica tracce Telecronaca AI...';
+                for (const clip of readyVoiceClips) {
                     try {
-                        let buf = await getDecodedAudioBufferForClip(clip, Boolean(clip.processedAudioBase64));
-                        if (buf && state.settings.tvBoothFilterEnabled && (state.settings.tvBoothIntensity ?? 70) > 0 && typeof OfflineAudioContext !== 'undefined') {
+                        let buf = await getDecodedAudioBufferForClip(clip, !exportUseCabina);
+                        if (buf && exportUseCabina && (state.settings.cabinaIntensity ?? 75) > 0 && typeof OfflineAudioContext !== 'undefined') {
                             try {
                                 const offLen = Math.ceil((buf.duration + 0.30) * buf.sampleRate);
                                 const offCtx = new OfflineAudioContext(Math.min(2, buf.numberOfChannels), offLen, buf.sampleRate);
                                 const srcNode = offCtx.createBufferSource();
                                 srcNode.buffer = buf;
-                                buildTvBoothChain(offCtx, srcNode, offCtx.destination, true, state.settings.tvBoothPreset || 'cabina', state.settings.tvBoothIntensity ?? 70);
+                                buildTvBoothChain(offCtx, srcNode, offCtx.destination, true, state.settings.cabinaPreset || 'cabina', state.settings.cabinaIntensity ?? 75);
                                 srcNode.start(0);
                                 buf = await offCtx.startRendering();
                             } catch (fErr) {
@@ -8152,9 +8465,9 @@
                     try {
                         const sr = pcmTargetSr;
                         const ch = pcmTargetCh;
-                        const aiVol = state.settings.aiCommentaryVolume ?? 1.0;
-                        const aiPitchRatio = Math.pow(2, Number(state.settings.aiCommentaryPitch || 0) / 12);
-                        const duckGain = state.settings.aiCommentaryDuckingGain ?? 0.25;
+                        const aiVol = exportUseCabina ? (state.settings.cabinaVolume ?? 1.10) : (state.settings.aiCommentaryVolume ?? 1.0);
+                        const aiPitchRatio = Math.pow(2, Number(exportUseCabina ? (state.settings.cabinaPitch || 0) : (state.settings.aiCommentaryPitch || 0)) / 12);
+                        const duckGain = exportUseCabina ? (state.settings.cabinaDuckingGain ?? 0.25) : (state.settings.aiCommentaryDuckingGain ?? 0.25);
                         const duckFadeSec = 0.25;
                         const aacConfig = {
                             codec: 'mp4a.40.2',
@@ -8517,7 +8830,7 @@
                 activeExportTracksToStop.push(...canvasVideoTracks);
                 const tracks = [...canvasVideoTracks];
 
-                const hasReadyAiComm = Boolean(isPttMicAvailable() && state.aiCommentaryClips.some(c => c.processedAudioBase64 || (state.settings.tvBoothFilterEnabled && c.rawAudioBase64)));
+                const hasReadyAiComm = Boolean((state.settings.cabinaEnabled && (state.cabinaClips || []).some(c => c.rawAudioBase64)) || (state.settings.aiCommentaryEnabled && (state.aiCommentaryClips || []).some(c => c.processedAudioBase64)));
                 if (hasReadyAiComm && !greenScreen) {
                     await ensureAudioPipeline();
                     resetAiCommentaryPlaybackCursor(startT);
@@ -10541,7 +10854,7 @@
             if (state.isExporting) return;
             const payload = {
                 app: 'SCOREPADEL',
-                version: 37,
+                version: 38,
                 savedAt: new Date().toISOString(),
                 settings: state.settings,
                 replayDuration: state.replayDuration,
@@ -10549,6 +10862,7 @@
                 events: state.events,
                 replays: state.replays,
                 aiCommentaryClips: state.aiCommentaryClips,
+                cabinaClips: state.cabinaClips,
                 playerPhotos: state.playerPhotos,
                 channelLogoDataUrl: state.channelLogoDataUrl
             };
@@ -10635,12 +10949,18 @@
                     setVal('ai-commentary-speed', Number(state.settings.aiCommentarySpeed || 1.0).toFixed(2));
                     setVal('ai-commentary-volume', Number(state.settings.aiCommentaryVolume ?? 1.0).toFixed(2));
                     setVal('ai-commentary-ducking', Number(state.settings.aiCommentaryDuckingGain ?? 0.25).toFixed(2));
-                    setChk('tv-booth-filter-enabled', state.settings.tvBoothFilterEnabled);
-                    setVal('tv-booth-preset', state.settings.tvBoothPreset || 'cabina');
-                    setVal('tv-booth-intensity', Number(state.settings.tvBoothIntensity ?? 70));
+                    state.cabinaClips = Array.isArray(data.cabinaClips) ? data.cabinaClips : [];
+                    state.cabinaClips.sort((a, b) => a.timestamp - b.timestamp);
+                    setChk('cabina-enabled', state.settings.cabinaEnabled);
+                    setVal('cabina-preset', state.settings.cabinaPreset || 'cabina');
+                    setVal('cabina-intensity', Number(state.settings.cabinaIntensity ?? 75));
+                    setVal('cabina-pitch', Number(state.settings.cabinaPitch || 0));
+                    setVal('cabina-volume', Number(state.settings.cabinaVolume ?? 1.10).toFixed(2));
+                    setVal('cabina-ducking', Number(state.settings.cabinaDuckingGain ?? 0.25).toFixed(2));
                     updateAiCommentarySettings();
-                    updateTvBoothFilterSettings();
+                    updateCabinaSettings();
                     renderAiCommentaryClipsList();
+                    renderCabinaClipsList();
 
                     // Bandiere, foto giocatori e logo canale
                     FLAG_PICKER_CONFIG.forEach(({ containerId, settingKey }) => {
@@ -10682,6 +11002,7 @@
             loadAiCommentaryCredentials();
             syncAiCommentaryUI();
             renderAiCommentaryClipsList();
+            renderCabinaClipsList();
             recalculateScoreAtTime(0);
             setExportEngine(state.exportEngine);
             renderReplaysList();
