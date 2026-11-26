@@ -489,24 +489,29 @@
                                 </div>
                             </button>
 
-                            <!-- Gruppo Destra: Highlight (H) + Microfono Push-to-Talk Centrato + Annulla (Z) -->
-                            <div id="right-actions-grid" class="sm:col-span-4 grid grid-cols-2 items-center gap-2">
+                            <!-- Gruppo Destra: Highlight (H) + Microfono Push-to-Talk Centrato (con blocco slide-up) + Annulla (Z) -->
+                            <div id="right-actions-grid" class="sm:col-span-4 grid grid-cols-2 items-stretch gap-2">
                                 <!-- Flag Highlight (H) -->
-                                <button type="button" id="btn-toggle-last-highlight" onclick="toggleLastPointHighlight()" class="w-full h-full min-h-[64px] bg-sp-bg hover:bg-sp-elevated border border-amber-400/40 hover:border-amber-400 rounded p-2 text-amber-300 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Marca l'ultimo punto come Highlight automatico (tra punto precedente e attuale) [H]">
-                                    <span id="btn-last-hl-star" class="text-base leading-none">☆</span>
-                                    <span class="text-[10px] font-mono font-bold uppercase truncate w-full text-center">Highlight (H)</span>
+                                <button type="button" id="btn-toggle-last-highlight" onclick="toggleLastPointHighlight()" class="w-full h-[68px] bg-sp-bg hover:bg-sp-elevated border border-amber-400/40 hover:border-amber-400 rounded p-2 text-amber-300 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Marca l'ultimo punto come Highlight automatico (tra punto precedente e attuale) [H]">
+                                    <span id="btn-last-hl-star" class="h-4 flex items-center justify-center text-base leading-none">☆</span>
+                                    <span class="text-[10px] font-mono font-bold uppercase truncate w-full text-center leading-tight">Highlight (H)</span>
                                 </button>
 
-                                <!-- Pulsante Push-to-Talk (rotondo a microfono, centrato esattamente tra Highlight e Annulla) -->
-                                <div id="ptt-commentary-slot" class="hidden flex items-center justify-center px-0.5">
+                                <!-- Pulsante Push-to-Talk (rotondo a microfono, centrato esattamente tra Highlight e Annulla, trascina su per bloccare) -->
+                                <div id="ptt-commentary-slot" class="hidden relative self-center flex items-center justify-center px-0.5">
+                                    <!-- Indicatore Slide-Up per bloccare la registrazione -->
+                                    <div id="ptt-lock-hint" class="hidden absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-sp-bg/95 border border-rose-500/60 text-[9.5px] font-mono font-bold text-rose-300 shadow-lg pointer-events-none flex items-center gap-1 z-30">
+                                        <span id="ptt-lock-hint-text">↑ Blocca</span>
+                                    </div>
                                     <button type="button" id="btn-ptt-commentary"
                                         onpointerdown="handlePttPointerDown(event)"
+                                        onpointermove="handlePttPointerMove(event)"
                                         onpointerup="handlePttPointerUp(event)"
                                         onpointercancel="handlePttPointerUp(event)"
                                         oncontextmenu="return false;"
                                         style="touch-action: none;"
-                                        class="relative w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full bg-sp-bg hover:bg-sp-elevated border-2 border-sp-lime/80 hover:border-sp-lime text-sp-lime shadow-lg transition-all select-none flex flex-col items-center justify-center gap-0.5 active:scale-95"
-                                        title="Push-to-Talk: tieni premuto per parlare (oppure tieni premuto T)">
+                                        class="relative w-[60px] h-[60px] rounded-full bg-sp-bg hover:bg-sp-elevated border-2 border-sp-lime/80 hover:border-sp-lime text-sp-lime shadow-lg transition-all select-none flex flex-col items-center justify-center gap-0.5 active:scale-95"
+                                        title="Push-to-Talk: tieni premuto per parlare, trascina verso l'alto per bloccare (oppure tasto T)">
                                         <span id="ptt-pulse-ring" class="hidden absolute -inset-1 rounded-full border-2 border-rose-500 animate-ping pointer-events-none"></span>
                                         <i data-lucide="mic" class="w-5 h-5"></i>
                                         <span id="ptt-btn-label" class="text-[9px] font-mono font-extrabold uppercase leading-none">T</span>
@@ -514,9 +519,9 @@
                                 </div>
 
                                 <!-- Annulla ultimo (Z) -->
-                                <button type="button" onclick="undoLastPoint()" class="w-full h-full min-h-[64px] bg-sp-bg hover:bg-sp-elevated border border-sp-border hover:border-rose-500/60 rounded p-2 text-sp-muted hover:text-rose-400 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Annulla ultimo punto (Z)">
-                                    <i data-lucide="undo-2" class="w-4 h-4"></i>
-                                    <span class="text-[10px] font-mono font-bold uppercase truncate w-full text-center">Annulla (Z)</span>
+                                <button type="button" onclick="undoLastPoint()" class="w-full h-[68px] bg-sp-bg hover:bg-sp-elevated border border-sp-border hover:border-rose-500/60 rounded p-2 text-sp-muted hover:text-rose-400 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Annulla ultimo punto (Z)">
+                                    <i data-lucide="undo-2" class="w-4 h-4 shrink-0"></i>
+                                    <span class="text-[10px] font-mono font-bold uppercase truncate w-full text-center leading-tight">Annulla (Z)</span>
                                 </button>
                             </div>
                         </div>
@@ -1226,6 +1231,48 @@
                                             <input type="range" id="cabina-pitch" min="-4" max="4" step="0.5" value="0" oninput="updateCabinaSettings()" class="w-full">
                                         </div>
 
+                                        <div class="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <div class="flex justify-between text-[10.5px] mb-0.5">
+                                                    <span class="text-sp-muted">Bassi / Calore</span>
+                                                    <span id="cabina-bass-val" class="font-mono text-sky-300 font-bold tabular-nums">0 dB</span>
+                                                </div>
+                                                <input type="range" id="cabina-bass" min="-8" max="8" step="1" value="0" oninput="updateCabinaSettings()" class="w-full">
+                                            </div>
+                                            <div>
+                                                <div class="flex justify-between text-[10.5px] mb-0.5">
+                                                    <span class="text-sp-muted">Presenza TV</span>
+                                                    <span id="cabina-presence-val" class="font-mono text-sky-300 font-bold tabular-nums">0 dB</span>
+                                                </div>
+                                                <input type="range" id="cabina-presence" min="-6" max="8" step="1" value="0" oninput="updateCabinaSettings()" class="w-full">
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2.5">
+                                            <div>
+                                                <div class="flex justify-between text-[10.5px] mb-0.5">
+                                                    <span class="text-sp-muted">Compressione</span>
+                                                    <span id="cabina-comp-val" class="font-mono text-sky-300 font-bold tabular-nums">60%</span>
+                                                </div>
+                                                <input type="range" id="cabina-comp" min="0" max="100" step="5" value="60" oninput="updateCabinaSettings()" class="w-full">
+                                            </div>
+                                            <div>
+                                                <div class="flex justify-between text-[10.5px] mb-0.5">
+                                                    <span class="text-sp-muted">Riverbero Cabina</span>
+                                                    <span id="cabina-reverb-val" class="font-mono text-sky-300 font-bold tabular-nums">20%</span>
+                                                </div>
+                                                <input type="range" id="cabina-reverb" min="0" max="100" step="5" value="20" oninput="updateCabinaSettings()" class="w-full">
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-[10.5px] mb-0.5">
+                                                <span class="text-sp-muted">De-Esser / Morbidezza Alte</span>
+                                                <span id="cabina-deesser-val" class="font-mono text-sky-300 font-bold tabular-nums">30%</span>
+                                            </div>
+                                            <input type="range" id="cabina-deesser" min="0" max="100" step="5" value="30" oninput="updateCabinaSettings()" class="w-full">
+                                        </div>
+
                                         <div>
                                             <div class="flex justify-between text-[11px] mb-0.5">
                                                 <span class="text-sp-muted">Volume Voce Cabina</span>
@@ -1858,6 +1905,11 @@
                 cabinaPreset: 'cabina',
                 cabinaIntensity: 75,
                 cabinaPitch: 0,
+                cabinaBass: 0,
+                cabinaPresence: 0,
+                cabinaComp: 60,
+                cabinaReverb: 20,
+                cabinaDeEsser: 30,
                 cabinaVolume: 1.10,
                 cabinaDuckingGain: 0.25
             },
@@ -1952,12 +2004,27 @@
             return impulse;
         }
 
-        function buildTvBoothChain(ctxObj, inputNode, outputNode, enabled, preset, intensityPct) {
+        function getCabinaDspOpts() {
+            const s = state.settings;
+            return {
+                bassDb: Number(s.cabinaBass || 0),
+                presenceDb: Number(s.cabinaPresence || 0),
+                compPct: Number(s.cabinaComp ?? 60),
+                reverbPct: Number(s.cabinaReverb ?? 20),
+                deEsserPct: Number(s.cabinaDeEsser ?? 30)
+            };
+        }
+
+        function buildTvBoothChain(ctxObj, inputNode, outputNode, enabled, preset, intensityPct, opts = null) {
             const dryGain = ctxObj.createGain();
             const wetGain = ctxObj.createGain();
 
             const hp = ctxObj.createBiquadFilter();
             hp.type = 'highpass';
+
+            const lowShelf = ctxObj.createBiquadFilter();
+            lowShelf.type = 'lowshelf';
+            lowShelf.frequency.value = 165;
 
             const boxCut = ctxObj.createBiquadFilter();
             boxCut.type = 'peaking';
@@ -1968,12 +2035,17 @@
             presence.type = 'peaking';
             presence.Q.value = 1.1;
 
+            const deEsser = ctxObj.createBiquadFilter();
+            deEsser.type = 'peaking';
+            deEsser.frequency.value = 6400;
+            deEsser.Q.value = 2.0;
+
             const lp = ctxObj.createBiquadFilter();
             lp.type = 'lowpass';
 
             const comp = ctxObj.createDynamicsCompressor();
             const reverb = ctxObj.createConvolver();
-            reverb.buffer = createBoothImpulseResponse(ctxObj, 0.22, 3.4);
+            reverb.buffer = createBoothImpulseResponse(ctxObj, 0.25, 3.1);
             const reverbGain = ctxObj.createGain();
             const wetSum = ctxObj.createGain();
 
@@ -1981,9 +2053,11 @@
             dryGain.connect(outputNode);
 
             inputNode.connect(hp);
-            hp.connect(boxCut);
+            hp.connect(lowShelf);
+            lowShelf.connect(boxCut);
             boxCut.connect(presence);
-            presence.connect(lp);
+            presence.connect(deEsser);
+            deEsser.connect(lp);
             lp.connect(comp);
             comp.connect(wetSum);
             comp.connect(reverb);
@@ -1992,35 +2066,44 @@
             wetSum.connect(wetGain);
             wetGain.connect(outputNode);
 
-            const nodes = { dryGain, wetGain, hp, boxCut, presence, lp, comp, reverbGain };
-            applyTvBoothParamsToNodes(ctxObj, nodes, enabled, preset, intensityPct);
+            const nodes = { dryGain, wetGain, hp, lowShelf, boxCut, presence, deEsser, lp, comp, reverbGain };
+            applyTvBoothParamsToNodes(ctxObj, nodes, enabled, preset, intensityPct, opts || getCabinaDspOpts());
             return nodes;
         }
 
-        function applyTvBoothParamsToNodes(ctxObj, nodes, enabled, preset, intensityPct) {
+        function applyTvBoothParamsToNodes(ctxObj, nodes, enabled, preset, intensityPct, opts = null) {
             if (!nodes) return;
+            const o = opts || getCabinaDspOpts();
             const mix = enabled ? Math.max(0, Math.min(1, (Number(intensityPct) || 0) / 100)) : 0;
             const nowT = ctxObj ? ctxObj.currentTime : 0;
 
             const cfg = {
-                cabina:     { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.8, thresh: -22, ratio: 4.5, rev: 0.14 },
-                bordocampo: { hp: 185, lp: 5600, cutDb: -3.5, presHz: 2400, presDb: 5.0, thresh: -24, ratio: 6.0, rev: 0.22 },
-                studio:     { hp: 95,  lp: 9200, cutDb: -1.8, presHz: 3100, presDb: 2.6, thresh: -18, ratio: 3.5, rev: 0.08 },
-                profonda:   { hp: 80,  lp: 6400, cutDb: 2.2,  presHz: 2500, presDb: 3.2, thresh: -24, ratio: 5.5, rev: 0.12 }
-            }[preset] || { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.8, thresh: -22, ratio: 4.5, rev: 0.14 };
+                cabina:     { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.4, thresh: -20, ratio: 4.0, rev: 0.14 },
+                bordocampo: { hp: 185, lp: 5600, cutDb: -3.5, presHz: 2400, presDb: 4.5, thresh: -22, ratio: 5.5, rev: 0.22 },
+                studio:     { hp: 95,  lp: 9200, cutDb: -1.8, presHz: 3100, presDb: 2.2, thresh: -16, ratio: 3.0, rev: 0.08 },
+                profonda:   { hp: 75,  lp: 6400, cutDb: 2.2,  presHz: 2500, presDb: 2.8, thresh: -22, ratio: 5.0, rev: 0.12 }
+            }[preset] || { hp: 130, lp: 7200, cutDb: -2.8, presHz: 2700, presDb: 3.4, thresh: -20, ratio: 4.0, rev: 0.14 };
+
+            const compFactor = Math.max(0, Math.min(1, (Number(o.compPct) || 0) / 100));
+            const finalThresh = -8 - compFactor * 22; // -8 dB to -30 dB
+            const finalRatio = 1.2 + compFactor * (cfg.ratio + 2.5);
+            const finalRev = Math.max(0, Math.min(0.65, ((Number(o.reverbPct) || 0) / 100) * 0.55));
+            const deEssDb = -((Math.max(0, Math.min(100, Number(o.deEsserPct) || 0)) / 100) * 9.0);
 
             try {
                 nodes.hp.frequency.setValueAtTime(cfg.hp, nowT);
-                nodes.lp.frequency.setValueAtTime(cfg.lp, nowT);
+                nodes.lowShelf.gain.setValueAtTime(Number(o.bassDb || 0), nowT);
                 nodes.boxCut.gain.setValueAtTime(cfg.cutDb, nowT);
                 nodes.presence.frequency.setValueAtTime(cfg.presHz, nowT);
-                nodes.presence.gain.setValueAtTime(cfg.presDb, nowT);
-                nodes.comp.threshold.setValueAtTime(cfg.thresh, nowT);
+                nodes.presence.gain.setValueAtTime(cfg.presDb + Number(o.presenceDb || 0), nowT);
+                nodes.deEsser.gain.setValueAtTime(deEssDb, nowT);
+                nodes.lp.frequency.setValueAtTime(cfg.lp, nowT);
+                nodes.comp.threshold.setValueAtTime(finalThresh, nowT);
                 nodes.comp.knee.setValueAtTime(14, nowT);
-                nodes.comp.ratio.setValueAtTime(cfg.ratio, nowT);
+                nodes.comp.ratio.setValueAtTime(finalRatio, nowT);
                 nodes.comp.attack.setValueAtTime(0.005, nowT);
                 nodes.comp.release.setValueAtTime(0.14, nowT);
-                nodes.reverbGain.gain.setValueAtTime(cfg.rev * mix, nowT);
+                nodes.reverbGain.gain.setValueAtTime(finalRev * mix, nowT);
                 nodes.dryGain.gain.setValueAtTime(1.0 - mix, nowT);
                 nodes.wetGain.gain.setValueAtTime(mix * 1.12, nowT);
             } catch (_) {
@@ -2156,6 +2239,8 @@
 
         const aiCommRuntime = {
             isRecording: false,
+            isLocked: false,
+            pointerStartY: 0,
             isProcessing: false,
             mediaStream: null,
             mediaRecorder: null,
@@ -2276,6 +2361,18 @@
             const cabPitch = Number(s.cabinaPitch || 0);
             const cabPitchVal = document.getElementById('cabina-pitch-val');
             if (cabPitchVal) cabPitchVal.textContent = `${cabPitch > 0 ? '+' : ''}${cabPitch.toFixed(1).replace('.0', '')} st`;
+            const cabBass = Number(s.cabinaBass || 0);
+            const cabBassVal = document.getElementById('cabina-bass-val');
+            if (cabBassVal) cabBassVal.textContent = `${cabBass > 0 ? '+' : ''}${cabBass} dB`;
+            const cabPres = Number(s.cabinaPresence || 0);
+            const cabPresVal = document.getElementById('cabina-presence-val');
+            if (cabPresVal) cabPresVal.textContent = `${cabPres > 0 ? '+' : ''}${cabPres} dB`;
+            const cabCompVal = document.getElementById('cabina-comp-val');
+            if (cabCompVal) cabCompVal.textContent = `${Math.round(s.cabinaComp ?? 60)}%`;
+            const cabRevVal = document.getElementById('cabina-reverb-val');
+            if (cabRevVal) cabRevVal.textContent = `${Math.round(s.cabinaReverb ?? 20)}%`;
+            const cabDeEssVal = document.getElementById('cabina-deesser-val');
+            if (cabDeEssVal) cabDeEssVal.textContent = `${Math.round(s.cabinaDeEsser ?? 30)}%`;
             const cabVolVal = document.getElementById('cabina-volume-val');
             if (cabVolVal) cabVolVal.textContent = `${Math.round((s.cabinaVolume ?? 1.10) * 100)}%`;
             const cabDuckVal = document.getElementById('cabina-ducking-val');
@@ -2302,6 +2399,11 @@
             setV('cabina-preset', 'cabina');
             setV('cabina-intensity', 75);
             setV('cabina-pitch', 0);
+            setV('cabina-bass', 0);
+            setV('cabina-presence', 0);
+            setV('cabina-comp', 60);
+            setV('cabina-reverb', 20);
+            setV('cabina-deesser', 30);
             setV('cabina-volume', '1.10');
             setV('cabina-ducking', '0.25');
             updateCabinaSettings();
@@ -2351,6 +2453,11 @@
             const preEl = document.getElementById('cabina-preset');
             const intEl = document.getElementById('cabina-intensity');
             const pitchEl = document.getElementById('cabina-pitch');
+            const bassEl = document.getElementById('cabina-bass');
+            const presEl = document.getElementById('cabina-presence');
+            const compEl = document.getElementById('cabina-comp');
+            const revEl = document.getElementById('cabina-reverb');
+            const deEssEl = document.getElementById('cabina-deesser');
             const volEl = document.getElementById('cabina-volume');
             const duckEl = document.getElementById('cabina-ducking');
 
@@ -2367,6 +2474,11 @@
             if (preEl) state.settings.cabinaPreset = preEl.value || 'cabina';
             if (intEl) state.settings.cabinaIntensity = Math.max(0, Math.min(100, parseFloat(intEl.value) || 0));
             if (pitchEl) state.settings.cabinaPitch = Math.max(-4, Math.min(4, parseFloat(pitchEl.value) || 0));
+            if (bassEl) state.settings.cabinaBass = Math.max(-8, Math.min(8, parseFloat(bassEl.value) || 0));
+            if (presEl) state.settings.cabinaPresence = Math.max(-6, Math.min(8, parseFloat(presEl.value) || 0));
+            if (compEl) state.settings.cabinaComp = Math.max(0, Math.min(100, parseFloat(compEl.value) || 0));
+            if (revEl) state.settings.cabinaReverb = Math.max(0, Math.min(100, parseFloat(revEl.value) || 0));
+            if (deEssEl) state.settings.cabinaDeEsser = Math.max(0, Math.min(100, parseFloat(deEssEl.value) || 0));
             if (volEl) state.settings.cabinaVolume = Math.max(0.20, Math.min(1.60, parseFloat(volEl.value) || 1.10));
             if (duckEl) state.settings.cabinaDuckingGain = Math.max(0.0, Math.min(1.0, parseFloat(duckEl.value) || 0.25));
 
@@ -2412,18 +2524,31 @@
             const ring = document.getElementById('ptt-pulse-ring');
             const lbl = document.getElementById('ptt-btn-label');
             const pill = document.getElementById('ptt-rec-pill');
+            const lockHint = document.getElementById('ptt-lock-hint');
+            const lockHintTxt = document.getElementById('ptt-lock-hint-text');
             if (!btn) return;
             const isCab = Boolean(state.settings.cabinaEnabled);
+            const isLocked = Boolean(recording && aiCommRuntime.isLocked);
             btn.classList.remove(
                 'bg-rose-600', 'border-rose-300', 'text-white', 'scale-105',
+                'bg-amber-500', 'border-amber-200', 'text-sp-bg',
                 'bg-sp-bg', 'hover:bg-sp-elevated',
                 'border-sp-lime/80', 'border-sp-lime/70', 'hover:border-sp-lime', 'text-sp-lime',
                 'border-sky-400/80', 'hover:border-sky-300', 'text-sky-300'
             );
             if (recording) {
-                btn.classList.add('bg-rose-600', 'border-rose-300', 'text-white', 'scale-105');
+                if (isLocked) {
+                    btn.classList.add('bg-amber-500', 'border-amber-200', 'text-sp-bg', 'scale-105');
+                    if (lbl) lbl.textContent = 'STOP';
+                    if (lockHint) lockHint.classList.remove('hidden');
+                    if (lockHintTxt) lockHintTxt.textContent = '🔒 Tocca per Stop';
+                } else {
+                    btn.classList.add('bg-rose-600', 'border-rose-300', 'text-white', 'scale-105');
+                    if (lbl) lbl.textContent = 'REC';
+                    if (lockHint) lockHint.classList.remove('hidden');
+                    if (lockHintTxt) lockHintTxt.textContent = '↑ Trascina su: Blocca';
+                }
                 if (ring) ring.classList.remove('hidden');
-                if (lbl) lbl.textContent = 'REC';
                 if (pill) pill.classList.remove('hidden');
             } else {
                 btn.classList.add('bg-sp-bg', 'hover:bg-sp-elevated');
@@ -2436,21 +2561,41 @@
                 }
                 if (ring) ring.classList.add('hidden');
                 if (pill) pill.classList.add('hidden');
+                if (lockHint) lockHint.classList.add('hidden');
             }
         }
 
         function handlePttPointerDown(e) {
+            if (e) e.preventDefault();
+            // Se la registrazione è bloccata, un nuovo clic la ferma e la salva
+            if (aiCommRuntime.isRecording && aiCommRuntime.isLocked) {
+                aiCommRuntime.isLocked = false;
+                stopPttRecording(false);
+                return;
+            }
             if (e) {
-                e.preventDefault();
+                aiCommRuntime.pointerStartY = e.clientY || 0;
                 if (e.currentTarget && typeof e.currentTarget.setPointerCapture === 'function') {
                     try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
                 }
             }
+            aiCommRuntime.isLocked = false;
             startPttRecording();
+        }
+
+        function handlePttPointerMove(e) {
+            if (!aiCommRuntime.isRecording || aiCommRuntime.isLocked || !e) return;
+            const dy = aiCommRuntime.pointerStartY - (e.clientY || 0);
+            if (dy >= 34) {
+                aiCommRuntime.isLocked = true;
+                updatePttButtonVisual(true);
+                showToast('Registrazione bloccata: tocca di nuovo il microfono per fermare.', 'info');
+            }
         }
 
         function handlePttPointerUp(e) {
             if (e) e.preventDefault();
+            if (aiCommRuntime.isLocked) return;
             stopPttRecording(false);
         }
 
@@ -2605,6 +2750,7 @@
             }
             const wasRec = aiCommRuntime.isRecording;
             aiCommRuntime.isRecording = false;
+            aiCommRuntime.isLocked = false;
             updatePttButtonVisual(false);
             if (!wasRec) return;
 
@@ -10854,7 +11000,7 @@
             if (state.isExporting) return;
             const payload = {
                 app: 'SCOREPADEL',
-                version: 38,
+                version: 39,
                 savedAt: new Date().toISOString(),
                 settings: state.settings,
                 replayDuration: state.replayDuration,
@@ -10955,6 +11101,11 @@
                     setVal('cabina-preset', state.settings.cabinaPreset || 'cabina');
                     setVal('cabina-intensity', Number(state.settings.cabinaIntensity ?? 75));
                     setVal('cabina-pitch', Number(state.settings.cabinaPitch || 0));
+                    setVal('cabina-bass', Number(state.settings.cabinaBass || 0));
+                    setVal('cabina-presence', Number(state.settings.cabinaPresence || 0));
+                    setVal('cabina-comp', Number(state.settings.cabinaComp ?? 60));
+                    setVal('cabina-reverb', Number(state.settings.cabinaReverb ?? 20));
+                    setVal('cabina-deesser', Number(state.settings.cabinaDeEsser ?? 30));
                     setVal('cabina-volume', Number(state.settings.cabinaVolume ?? 1.10).toFixed(2));
                     setVal('cabina-ducking', Number(state.settings.cabinaDuckingGain ?? 0.25).toFixed(2));
                     updateAiCommentarySettings();
