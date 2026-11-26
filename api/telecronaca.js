@@ -23,11 +23,26 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
-    const { voice = "ash", tournamentTitle = "Partita Padel", team1 = "Coppia 1", team2 = "Coppia 2", clips = [] } = body;
+    const {
+      voice = "ash",
+      accent = "spagnolo_leggero",
+      mood = "sobrio",
+      speed = 1.0,
+      pitchSemitones = 0,
+      tournamentTitle = "Partita Padel",
+      team1 = "Coppia 1",
+      team2 = "Coppia 2",
+      clips = []
+    } = body;
 
     if (!Array.isArray(clips) || clips.length === 0) {
       return res.status(400).json({ error: "Nessuna clip inviata" });
     }
+
+    const safeSpeed = Math.max(0.75, Math.min(1.30, Number(speed) || 1.0));
+
+    // Prompt lessicale per Whisper/gpt-4o-mini-transcribe: evita errori su termini di padel
+    const sttPadelPrompt = `Telecronaca di padel in italiano (${team1} vs ${team2}). Termini frequenti: per tre, x3, por tres, per quattro, x4, por cuatro, smash, remate, bandeja, vibora, chiquita, bajada, rulo, gancho, dormilona, dejada, globo, pallonetto, volee, volée, controvetro, contrapared, uscita di parete, salida de pared, doppio vetro, reja, griglia, porta, punto de oro, killer point, palla break, nevera, willy, tweener, cuchilla, boquilla.`;
 
     // 1. Trascrizione in parallelo con fallback automatico gpt-4o-mini-transcribe -> whisper-1
     async function transcribeClip(clip) {
@@ -41,6 +56,7 @@ export default async function handler(req, res) {
         formData.append("file", new Blob([audioBuffer], { type: mime }), `clip.${ext}`);
         formData.append("model", model);
         formData.append("language", "it");
+        formData.append("prompt", sttPadelPrompt);
         const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
           method: "POST",
           headers: { Authorization: `Bearer ${apiKey}` },
@@ -79,23 +95,49 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Nessun parlato rilevato nelle clip registrate" });
     }
 
-    // 2. Riscrittura naturale da telecronaca TV padel (mood spagnolo/Premier Padel in italiano)
-    const rewritePrompt = `Sei un telecronista televisivo di padel di origine spagnola che commenta in italiano per una diretta stile Premier Padel.
+    const moodGuide = {
+      sobrio: "Sobrio, tecnico e giornalistico (stile Premier Padel / Sky Sport). Zero urla, zero falsi entusiasmi.",
+      dinamico: "Dinamico e ritmato da diretta TV, leggermente più vivo sui punti decisivi, ma sempre credibile e mai urlato.",
+      calmo: "Calmo, analitico e disteso, da commentatore tecnico di studio."
+    }[mood] || "Sobrio, tecnico e giornalistico.";
+
+    // 2. Riscrittura naturale con glossario completo dei colpi di padel
+    const rewritePrompt = `Sei un telecronista televisivo esperto di padel che commenta in italiano per una diretta stile Premier Padel.
 Ricevi una lista cronologica di appunti vocali registrati durante "${tournamentTitle}" (${team1} vs ${team2}).
+
+GLOSSARIO UFFICIALE PADEL (INTERPRETA SEMPRE CON PRECISIONE ASSOLUTA):
+- "per tre" / "x3" / "por tres" / "fuori per tre" = smash che esce lateralmente sopra la parete da 3 metri (NON significa MAI "tre punti" o "tre vincenti"!). Nel testo scrivi sempre "per tre" o "smash per tre" (mai "x3" che la voce leggerebbe male).
+- "per quattro" / "x4" / "por cuatro" = smash potente che scavalca il vetro di fondo da 4 metri. Scrivi sempre "per quattro" (mai "x4").
+- "bandeja" = colpo difensivo-tattico sopra la testa tagliato per mantenere la rete.
+- "víbora" = colpo sopra la testa più veloce e con forte effetto laterale/tagliato.
+- "rulo" / "rulo alla griglia" = smash liftato verso la griglia laterale (reja).
+- "gancho" = colpo sopra la testa alto e controllato di emergenza per non perdere la rete.
+- "bajada" / "bajada de pared" = attacco potente dopo il rimbalzo alto sul vetro di fondo.
+- "chiquita" = palla morbida e bassa giocata ai piedi degli avversari a rete.
+- "dormilona" = smorzata delicatissima dopo uno smash avversario che rimbalza sul vetro.
+- "dejada" / "smorzata" = palla corta a morire subito dopo la rete.
+- "globo" / "pallonetto" = palla alta sopra gli avversari per toglierli dalla rete.
+- "contrapared" / "controvetro" = colpo difensivo giocato contro il proprio vetro di fondo.
+- "salida de pared" / "uscita di parete" = colpo dopo il rimbalzo sul vetro di fondo o laterale.
+- "boquilla" / "doble pared" / "doppio vetro" = rimbalzo su entrambi i vetri d'angolo.
+- "reja" / "griglia" = la rete metallica laterale.
+- "recupero da fuori" / "uscita dalla porta" = giocatore che esce dalla porta laterale per recuperare un "per tre".
+- "willy" / "tweener" = colpo tra le gambe.
+- "nevera" / "frigorifero" = strategia di giocare tutte le palle su un solo avversario escludendo il compagno.
+- "punto de oro" / "killer point" = punto decisivo sul quaranta pari.
 
 Per ogni intervento restituisci:
 - "id": ESATTAMENTE lo stesso id ricevuto in input
 - "text": frase in italiano PARLATO fluido, ritmato e naturale, coerente con gli interventi precedenti (linea narrativa unica).
-- "tone": breve indicazione di mood per la voce (es. "calmo e scorrevole", "ritmo leggermente serrato, attento", "sobrio con ammirazione trattenuta").
+- "tone": breve indicazione di registro per la voce (es. "calmo e scorrevole", "attento e concentrato", "sobrio con leggera ammirazione").
 
-MOOD E STILE:
-- Tono da commentatore tecnico di padel: competente, caldo, spontaneo, con quel ritmo musicale tipico delle telecronache spagnole ma senza mai urlare.
-- Usa frasi brevi e naturali da diretta, con pause vere usando virgole e puntini di sospensione (es. "Che mano morbida sulla chiquita... apre il campo, e chiude di volée. Trenta a quindici.").
-- Puoi usare i termini autentici del padel (bandeja, víbora, chiquita, bajada, globo, salida de pared) quando coerenti con l'appunto.
-- Scrivi i punteggi come si dicono a voce ("trenta a quaranta", "quaranta pari", "cinque a quattro").
-- ZERO falsi entusiasmi, ZERO punti esclamativi inutili, ZERO tono da spot o audiolibro.
+REGOLE DI SCRITTURA PER VOCE NATURALE:
+- Mood richiesto: ${moodGuide}
+- Scrivi come si PARLA in diretta TV, non come un articolo scritto.
+- Usa frasi brevi con pause naturali (virgole e puntini di sospensione "...").
+- Scrivi i punteggi in lettere quando suona più naturale ("trenta a quindici", "quaranta pari", "cinque a quattro").
+- Non scrivere simboli come "x3" o "x4": scrivi sempre "per tre" e "per quattro" così la pronuncia è perfetta.
 - Massimo 1-2 frasi per intervento, senza inventare colpi non menzionati.
-
 Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"...","tone":"..."}]}`;
 
     const chatResp = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -134,13 +176,32 @@ Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"..."
       return res.status(500).json({ error: "OpenAI ha restituito una riscrittura vuota" });
     }
 
-    // 3. Generazione audio studio MP3 in parallelo (accento spagnolo leggero + mood naturale)
+    const accentGuide = {
+      spagnolo_leggero: "Parla in italiano con un leggero e autentico accento spagnolo (come un telecronista spagnolo di padel che parla italiano in modo fluente e naturale, mai caricaturale).",
+      spagnolo_madrid: "Parla in italiano con un chiaro accento spagnolo di Madrid, caldo, musicale e spontaneo da telecronista di Premier Padel.",
+      argentino: "Parla in italiano con un leggero accento argentino rioplatense (caldo, ritmato e naturale, tipico dei commentatori sudamericani di padel).",
+      italiano: "Parla in italiano standard da telecronista sportivo televisivo (stile Sky Sport), pulito e naturale."
+    }[accent] || "Parla in italiano con un leggero e autentico accento spagnolo.";
+
+    const pitchHint = Number(pitchSemitones) <= -1.5
+      ? "Impostazione vocale: timbro leggermente più grave e profondo."
+      : (Number(pitchSemitones) >= 1.5 ? "Impostazione vocale: timbro leggermente più brillante e squillante." : "");
+
+    // 3. Generazione audio studio MP3 in parallelo con guida fonetica dei colpi di padel
     async function synthesizeClip(item) {
-      const ttsInstructions = `Parla in italiano con un leggero e autentico accento spagnolo (come un telecronista spagnolo di padel che parla italiano in modo fluente e naturale, mai caricaturale o forzato).
-Stile: commentatore sportivo televisivo in cabina (stile Premier Padel / Sky Sport), voce calda, viva e conversazionale, zero effetto robotico o da audiolibro.
-Ritmo: scorrevole e leggermente musicale, con micro-pause e respiri naturali sui puntini e sulle virgole. Pronuncia con accento spagnolo autentico i termini del padel (bandeja, víbora, chiquita, bajada, globo).
-Mood di questo intervento: ${item.tone}.
-Resta sempre sobrio e credibile: niente urla, niente entusiasmo finto.`;
+      const ttsInstructions = `${accentGuide}
+Stile: commentatore sportivo televisivo in cabina (stile Premier Padel), voce calda, viva e conversazionale, zero effetto robotico o da audiolibro.
+Ritmo: scorrevole e naturale, con micro-pause reali sui puntini e sulle virgole.
+PRONUNCIA CORRETTA DEI TERMINI PADEL (in spagnolo autentico):
+- "bandeja" si pronuncia "bandèha" (con la J aspirata spagnola, mai "bandegia")
+- "bajada" si pronuncia "bahàda" (con la J aspirata spagnola)
+- "reja" si pronuncia "rèha" (con la J aspirata spagnola)
+- "dejada" si pronuncia "dehàda"
+- "chiquita" si pronuncia "cikìta"
+- "víbora" si pronuncia "bìbora" (accento sulla prima sillaba)
+- "rulo", "gancho", "globo", "dormilona", "contrapared", "salida de pared" con cadenza spagnola naturale.
+${pitchHint}
+Mood di questo intervento: ${item.tone}. Resta sempre sobrio e credibile: niente urla, niente entusiasmo finto.`;
 
       let ttsResp = await fetch("https://api.openai.com/v1/audio/speech", {
         method: "POST",
@@ -151,6 +212,7 @@ Resta sempre sobrio e credibile: niente urla, niente entusiasmo finto.`;
         body: JSON.stringify({
           model: "gpt-4o-mini-tts",
           voice,
+          speed: safeSpeed,
           input: item.text,
           instructions: ttsInstructions,
           response_format: "mp3"
@@ -169,6 +231,7 @@ Resta sempre sobrio e credibile: niente urla, niente entusiasmo finto.`;
           body: JSON.stringify({
             model: "tts-1",
             voice: fbVoice,
+            speed: safeSpeed,
             input: item.text,
             response_format: "mp3"
           })
