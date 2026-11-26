@@ -489,30 +489,32 @@
                                 </div>
                             </button>
 
-                            <!-- Gruppo Destra: Highlight (H) + Telecronaca Push-to-Talk Rotondo + Annulla (Z) -->
-                            <div class="sm:col-span-4 flex items-stretch gap-2">
+                            <!-- Gruppo Destra: Highlight (H) + Microfono Push-to-Talk Centrato + Annulla (Z) -->
+                            <div class="sm:col-span-4 flex items-center justify-center gap-2.5">
                                 <!-- Flag Highlight (H) -->
-                                <button type="button" id="btn-toggle-last-highlight" onclick="toggleLastPointHighlight()" class="flex-1 bg-sp-bg hover:bg-sp-elevated border border-amber-400/40 hover:border-amber-400 rounded p-2 text-amber-300 transition flex sm:flex-col items-center justify-center gap-1 min-w-0" title="Marca l'ultimo punto come Highlight automatico (tra punto precedente e attuale) [H]">
+                                <button type="button" id="btn-toggle-last-highlight" onclick="toggleLastPointHighlight()" class="flex-1 basis-0 self-stretch bg-sp-bg hover:bg-sp-elevated border border-amber-400/40 hover:border-amber-400 rounded p-2 text-amber-300 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Marca l'ultimo punto come Highlight automatico (tra punto precedente e attuale) [H]">
                                     <span id="btn-last-hl-star" class="text-base leading-none">☆</span>
                                     <span class="text-[10.5px] font-mono font-bold uppercase truncate">Highlight (H)</span>
                                 </button>
 
-                                <!-- Pulsante Push-to-Talk Telecronaca AI (rotondo a microfono, visibile solo se attiva) -->
-                                <button type="button" id="btn-ptt-commentary"
-                                    onpointerdown="handlePttPointerDown(event)"
-                                    onpointerup="handlePttPointerUp(event)"
-                                    onpointercancel="handlePttPointerUp(event)"
-                                    oncontextmenu="return false;"
-                                    style="touch-action: none;"
-                                    class="hidden relative self-center shrink-0 w-14 h-14 sm:w-[64px] sm:h-[64px] rounded-full bg-sp-bg hover:bg-sp-elevated border-2 border-sp-lime/70 hover:border-sp-lime text-sp-lime shadow-lg transition-all select-none flex flex-col items-center justify-center gap-0.5 active:scale-95"
-                                    title="Telecronaca AI: tieni premuto per parlare (oppure tieni premuto T)">
-                                    <span id="ptt-pulse-ring" class="hidden absolute -inset-1 rounded-full border-2 border-rose-500 animate-ping pointer-events-none"></span>
-                                    <i data-lucide="mic" class="w-5 h-5"></i>
-                                    <span id="ptt-btn-label" class="text-[9px] font-mono font-extrabold uppercase leading-none">T</span>
-                                </button>
+                                <!-- Pulsante Push-to-Talk Telecronaca AI (rotondo a microfono, centrato tra Highlight e Annulla) -->
+                                <div id="ptt-commentary-slot" class="hidden shrink-0 flex items-center justify-center">
+                                    <button type="button" id="btn-ptt-commentary"
+                                        onpointerdown="handlePttPointerDown(event)"
+                                        onpointerup="handlePttPointerUp(event)"
+                                        onpointercancel="handlePttPointerUp(event)"
+                                        oncontextmenu="return false;"
+                                        style="touch-action: none;"
+                                        class="relative w-14 h-14 sm:w-[62px] sm:h-[62px] rounded-full bg-sp-bg hover:bg-sp-elevated border-2 border-sp-lime/80 hover:border-sp-lime text-sp-lime shadow-lg transition-all select-none flex flex-col items-center justify-center gap-0.5 active:scale-95"
+                                        title="Telecronaca AI: tieni premuto per parlare (oppure tieni premuto T)">
+                                        <span id="ptt-pulse-ring" class="hidden absolute -inset-1 rounded-full border-2 border-rose-500 animate-ping pointer-events-none"></span>
+                                        <i data-lucide="mic" class="w-5 h-5"></i>
+                                        <span id="ptt-btn-label" class="text-[9px] font-mono font-extrabold uppercase leading-none">T</span>
+                                    </button>
+                                </div>
 
                                 <!-- Annulla ultimo (Z) -->
-                                <button type="button" onclick="undoLastPoint()" class="flex-1 bg-sp-bg hover:bg-sp-elevated border border-sp-border hover:border-rose-500/60 rounded p-2 text-sp-muted hover:text-rose-400 transition flex sm:flex-col items-center justify-center gap-1 min-w-0" title="Annulla ultimo punto (Z)">
+                                <button type="button" onclick="undoLastPoint()" class="flex-1 basis-0 self-stretch bg-sp-bg hover:bg-sp-elevated border border-sp-border hover:border-rose-500/60 rounded p-2 text-sp-muted hover:text-rose-400 transition flex flex-col items-center justify-center gap-1 min-w-0" title="Annulla ultimo punto (Z)">
                                     <i data-lucide="undo-2" class="w-4 h-4"></i>
                                     <span class="text-[10.5px] font-mono font-bold uppercase truncate">Annulla (Z)</span>
                                 </button>
@@ -988,19 +990,41 @@
                                         Tieni premuto il pulsante microfono rotondo accanto a <strong class="text-sp-text">Highlight</strong> (o il tasto <strong class="text-sp-lime">[T]</strong>) mentre fai la regia. A fine partita premi <strong class="text-sp-text">Elabora Telecronaca AI</strong> per ottenere una voce studio sobria a linea unica, sincronizzata e mixata nell'export.
                                     </p>
 
-                                    <!-- Voce Studio OpenAI -->
-                                    <div class="flex flex-col gap-1">
-                                        <label for="ai-commentary-voice" class="text-[11px] font-semibold text-sp-text">Voce Studio OpenAI</label>
-                                        <select id="ai-commentary-voice" onchange="updateAiCommentarySettings()" class="w-full bg-sp-surface border border-sp-border rounded px-2.5 py-1.5 text-xs text-sp-text focus:outline-none focus:border-sp-lime">
-                                            <option value="ash" selected>Ash — Maschile Naturale (Consigliata)</option>
-                                            <option value="ballad">Ballad — Maschile Calda e Fluida (Consigliata)</option>
-                                            <option value="verse">Verse — Maschile Conversazionale (TV)</option>
-                                            <option value="echo">Echo — Maschile Chiara (Equilibrata)</option>
-                                            <option value="onyx">Onyx — Maschile Profonda (Studio)</option>
-                                            <option value="sage">Sage — Neutra Sobria (Analitica)</option>
-                                            <option value="coral">Coral — Femminile Fluida</option>
-                                            <option value="nova">Nova — Femminile Chiara</option>
-                                        </select>
+                                    <!-- Voce Studio OpenAI + Accento + Mood -->
+                                    <div class="flex flex-col gap-2">
+                                        <div class="flex flex-col gap-1">
+                                            <label for="ai-commentary-voice" class="text-[11px] font-semibold text-sp-text">Voce Studio OpenAI</label>
+                                            <select id="ai-commentary-voice" onchange="updateAiCommentarySettings()" class="w-full bg-sp-surface border border-sp-border rounded px-2.5 py-1.5 text-xs text-sp-text focus:outline-none focus:border-sp-lime">
+                                                <option value="ash" selected>Ash — Maschile Naturale (Consigliata)</option>
+                                                <option value="ballad">Ballad — Maschile Calda e Fluida (Consigliata)</option>
+                                                <option value="verse">Verse — Maschile Conversazionale (TV)</option>
+                                                <option value="echo">Echo — Maschile Chiara (Equilibrata)</option>
+                                                <option value="onyx">Onyx — Maschile Profonda (Studio)</option>
+                                                <option value="sage">Sage — Neutra Sobria (Analitica)</option>
+                                                <option value="coral">Coral — Femminile Fluida</option>
+                                                <option value="nova">Nova — Femminile Chiara</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div class="flex flex-col gap-1">
+                                                <label for="ai-commentary-accent" class="text-[10.5px] font-semibold text-sp-text">Accento</label>
+                                                <select id="ai-commentary-accent" onchange="updateAiCommentarySettings()" class="w-full bg-sp-surface border border-sp-border rounded px-2 py-1.5 text-[11px] text-sp-text focus:outline-none focus:border-sp-lime">
+                                                    <option value="spagnolo_leggero" selected>Spagnolo Leggero</option>
+                                                    <option value="spagnolo_madrid">Spagnolo Marcato</option>
+                                                    <option value="argentino">Argentino (Padel)</option>
+                                                    <option value="italiano">Italiano TV</option>
+                                                </select>
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <label for="ai-commentary-mood" class="text-[10.5px] font-semibold text-sp-text">Mood Regia</label>
+                                                <select id="ai-commentary-mood" onchange="updateAiCommentarySettings()" class="w-full bg-sp-surface border border-sp-border rounded px-2 py-1.5 text-[11px] text-sp-text focus:outline-none focus:border-sp-lime">
+                                                    <option value="sobrio" selected>Sobrio & Tecnico</option>
+                                                    <option value="dinamico">Dinamico TV</option>
+                                                    <option value="calmo">Calmo Analitico</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- PIN & Endpoint Netlify (salvati solo in localStorage) -->
@@ -1018,8 +1042,29 @@
                                         </details>
                                     </div>
 
-                                    <!-- Regolazioni Mix Audio -->
+                                    <!-- Parametri Vocali & Mix Audio -->
                                     <div class="flex flex-col gap-2 border-t border-sp-border pt-2">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-[10px] font-mono uppercase tracking-wider text-sp-muted">Parametri Vocali & Mix</span>
+                                            <button type="button" onclick="resetAiVoiceParams()" class="text-[10px] font-mono text-sp-lime hover:underline">Reset</button>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-[11px] mb-0.5">
+                                                <span class="text-sp-muted">Pitch / Tono Voce</span>
+                                                <span id="ai-commentary-pitch-val" class="font-mono text-sp-lime font-bold tabular-nums">0 st</span>
+                                            </div>
+                                            <input type="range" id="ai-commentary-pitch" min="-4" max="4" step="0.5" value="0" oninput="updateAiCommentarySettings()" class="w-full">
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-[11px] mb-0.5">
+                                                <span class="text-sp-muted">Velocità Parlato (OpenAI)</span>
+                                                <span id="ai-commentary-speed-val" class="font-mono text-sp-lime font-bold tabular-nums">1.00x</span>
+                                            </div>
+                                            <input type="range" id="ai-commentary-speed" min="0.80" max="1.25" step="0.05" value="1.00" oninput="updateAiCommentarySettings()" class="w-full">
+                                        </div>
+
                                         <div>
                                             <div class="flex justify-between text-[11px] mb-0.5">
                                                 <span class="text-sp-muted">Volume Voce AI</span>
@@ -1718,6 +1763,10 @@
                 showStatsCards: true,
                 aiCommentaryEnabled: false,
                 aiCommentaryVoice: 'ash',
+                aiCommentaryAccent: 'spagnolo_leggero',
+                aiCommentaryMood: 'sobrio',
+                aiCommentaryPitch: 0,
+                aiCommentarySpeed: 1.0,
                 aiCommentaryVolume: 1.0,
                 aiCommentaryDuckingGain: 0.25
             },
@@ -1959,28 +2008,51 @@
             const s = state.settings;
             const enabled = Boolean(s.aiCommentaryEnabled);
             const controlsEl = document.getElementById('ai-commentary-controls');
-            const pttBtn = document.getElementById('btn-ptt-commentary');
+            const pttSlot = document.getElementById('ptt-commentary-slot');
             const kbdHint = document.getElementById('ptt-kbd-hint');
 
             if (controlsEl) controlsEl.classList.toggle('hidden', !enabled);
-            if (pttBtn) pttBtn.classList.toggle('hidden', !enabled);
+            if (pttSlot) pttSlot.classList.toggle('hidden', !enabled);
             if (kbdHint) kbdHint.classList.toggle('hidden', !enabled);
 
+            const pitch = Number(s.aiCommentaryPitch || 0);
+            const pitchVal = document.getElementById('ai-commentary-pitch-val');
+            if (pitchVal) pitchVal.textContent = `${pitch > 0 ? '+' : ''}${pitch.toFixed(1).replace('.0', '')} st`;
+            const speedVal = document.getElementById('ai-commentary-speed-val');
+            if (speedVal) speedVal.textContent = `${Number(s.aiCommentarySpeed || 1.0).toFixed(2)}x`;
             const volVal = document.getElementById('ai-commentary-volume-val');
             if (volVal) volVal.textContent = `${Math.round((s.aiCommentaryVolume ?? 1.0) * 100)}%`;
             const duckVal = document.getElementById('ai-commentary-ducking-val');
             if (duckVal) duckVal.textContent = `${Math.round((s.aiCommentaryDuckingGain ?? 0.25) * 100)}%`;
         }
 
+        function resetAiVoiceParams() {
+            if (state.isExporting) return;
+            const setV = (id, v) => { const el = document.getElementById(id); if (el) el.value = String(v); };
+            setV('ai-commentary-pitch', 0);
+            setV('ai-commentary-speed', '1.00');
+            setV('ai-commentary-volume', '1.00');
+            setV('ai-commentary-ducking', '0.25');
+            updateAiCommentarySettings();
+        }
+
         function updateAiCommentarySettings() {
             if (state.isExporting) return;
             const enabledEl = document.getElementById('ai-commentary-enabled');
             const voiceEl = document.getElementById('ai-commentary-voice');
+            const accentEl = document.getElementById('ai-commentary-accent');
+            const moodEl = document.getElementById('ai-commentary-mood');
+            const pitchEl = document.getElementById('ai-commentary-pitch');
+            const speedEl = document.getElementById('ai-commentary-speed');
             const volEl = document.getElementById('ai-commentary-volume');
             const duckEl = document.getElementById('ai-commentary-ducking');
 
             state.settings.aiCommentaryEnabled = Boolean(enabledEl && enabledEl.checked);
-            if (voiceEl) state.settings.aiCommentaryVoice = voiceEl.value || 'onyx';
+            if (voiceEl) state.settings.aiCommentaryVoice = voiceEl.value || 'ash';
+            if (accentEl) state.settings.aiCommentaryAccent = accentEl.value || 'spagnolo_leggero';
+            if (moodEl) state.settings.aiCommentaryMood = moodEl.value || 'sobrio';
+            if (pitchEl) state.settings.aiCommentaryPitch = Math.max(-4, Math.min(4, parseFloat(pitchEl.value) || 0));
+            if (speedEl) state.settings.aiCommentarySpeed = Math.max(0.80, Math.min(1.25, parseFloat(speedEl.value) || 1.0));
             if (volEl) state.settings.aiCommentaryVolume = Math.max(0.20, Math.min(1.50, parseFloat(volEl.value) || 1.0));
             if (duckEl) state.settings.aiCommentaryDuckingGain = Math.max(0.0, Math.min(1.0, parseFloat(duckEl.value) || 0.25));
 
@@ -2256,6 +2328,10 @@
 
                 const src = audioCtx.createBufferSource();
                 src.buffer = buffer;
+                const pitchSemi = Number(state.settings.aiCommentaryPitch || 0);
+                if (useProcessed && pitchSemi !== 0 && src.detune) {
+                    src.detune.value = pitchSemi * 100;
+                }
                 src.connect(aiCommentaryGain);
                 aiCommRuntime.activeSourceNode = src;
                 aiCommRuntime.activeClipId = clip.id;
@@ -2341,7 +2417,11 @@
                     method: 'POST',
                     headers,
                     body: JSON.stringify({
-                        voice: state.settings.aiCommentaryVoice || 'onyx',
+                        voice: state.settings.aiCommentaryVoice || 'ash',
+                        accent: state.settings.aiCommentaryAccent || 'spagnolo_leggero',
+                        mood: state.settings.aiCommentaryMood || 'sobrio',
+                        speed: Number(state.settings.aiCommentarySpeed || 1.0),
+                        pitchSemitones: Number(state.settings.aiCommentaryPitch || 0),
                         tournamentTitle: state.settings.tournamentTitle || 'Partita Padel',
                         team1: getTeamPairName(1),
                         team2: getTeamPairName(2),
@@ -7866,6 +7946,7 @@
                         const sr = pcmTargetSr;
                         const ch = pcmTargetCh;
                         const aiVol = state.settings.aiCommentaryVolume ?? 1.0;
+                        const aiPitchRatio = Math.pow(2, Number(state.settings.aiCommentaryPitch || 0) / 12);
                         const duckGain = state.settings.aiCommentaryDuckingGain ?? 0.25;
                         const duckFadeSec = 0.25;
                         const aacConfig = {
@@ -7955,7 +8036,7 @@
                                                     // Campiona voce AI (resampling lineare se sampleRate diverso)
                                                     if (t >= cStart && t < cEnd) {
                                                         const cBuf = item.buffer;
-                                                        const fIdx = (t - cStart) * cBuf.sampleRate;
+                                                        const fIdx = (t - cStart) * cBuf.sampleRate * aiPitchRatio;
                                                         const idx0 = Math.floor(fIdx);
                                                         if (idx0 >= 0 && idx0 < cBuf.length) {
                                                             const frac = fIdx - idx0;
@@ -10253,7 +10334,7 @@
             if (state.isExporting) return;
             const payload = {
                 app: 'SCOREPADEL',
-                version: 35,
+                version: 36,
                 savedAt: new Date().toISOString(),
                 settings: state.settings,
                 replayDuration: state.replayDuration,
@@ -10340,7 +10421,11 @@
                     aiCommRuntime.bufferCache.clear();
                     aiCommRuntime.playedInPass.clear();
                     setChk('ai-commentary-enabled', state.settings.aiCommentaryEnabled);
-                    setVal('ai-commentary-voice', state.settings.aiCommentaryVoice || 'onyx');
+                    setVal('ai-commentary-voice', state.settings.aiCommentaryVoice || 'ash');
+                    setVal('ai-commentary-accent', state.settings.aiCommentaryAccent || 'spagnolo_leggero');
+                    setVal('ai-commentary-mood', state.settings.aiCommentaryMood || 'sobrio');
+                    setVal('ai-commentary-pitch', Number(state.settings.aiCommentaryPitch || 0));
+                    setVal('ai-commentary-speed', Number(state.settings.aiCommentarySpeed || 1.0).toFixed(2));
                     setVal('ai-commentary-volume', Number(state.settings.aiCommentaryVolume ?? 1.0).toFixed(2));
                     setVal('ai-commentary-ducking', Number(state.settings.aiCommentaryDuckingGain ?? 0.25).toFixed(2));
                     updateAiCommentarySettings();
