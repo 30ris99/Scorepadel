@@ -41,14 +41,29 @@ export default async function handler(req, res) {
 
     const safeSpeed = Math.max(0.75, Math.min(1.30, Number(speed) || 1.0));
 
-    // Prompt lessicale per Whisper/gpt-4o-mini-transcribe
-    const sttPadelPrompt = `Telecronaca di padel in italiano (${team1} vs ${team2}). Termini frequenti: per tre, x3, por tres, per quattro, x4, por cuatro, smash, remate, bandeja, vibora, chiquita, bajada, rulo, gancho, dormilona, dejada, globo, pallonetto, volee, volée, controvetro, contrapared, uscita di parete, salida de pared, doppio vetro, reja, griglia, porta, punto de oro, killer point, palla break, nevera, willy, tweener, cuchilla, boquilla.`;
+    // Filtro anti-allucinazioni su clip silenziose o con solo rumore
+    function isSilenceHallucination(text) {
+      const clean = text.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, "").trim();
+      if (clean.length < 3) return true;
+      const noisePatterns = [
+        /^sottotitoli/,
+        /^grazie per la visione/,
+        /^grazie per aver guardato/,
+        /^iscriviti al canale/,
+        /^amara org/,
+        /^traduzione/,
+        /^fine$/,
+        /^musica$/
+      ];
+      return noisePatterns.some((re) => re.test(clean));
+    }
 
-    // 1. Trascrizione in parallelo con fallback automatico gpt-4o-mini-transcribe -> whisper-1
+    // 1. Trascrizione SENZA prompt (evita che OpenAI copi la lista di parole sul silenzio)
     async function transcribeClip(clip) {
       if (!clip.rawAudioBase64) return null;
       const mime = (clip.rawAudioMime || "audio/webm").toLowerCase();
       const audioBuffer = Buffer.from(clip.rawAudioBase64, "base64");
+      if (audioBuffer.byteLength < 800) return null;
       const ext = mime.includes("mp4") ? "m4a" : (mime.includes("ogg") ? "ogg" : "webm");
 
       async function callTranscribe(model) {
@@ -56,7 +71,6 @@ export default async function handler(req, res) {
         formData.append("file", new Blob([audioBuffer], { type: mime }), `clip.${ext}`);
         formData.append("model", model);
         formData.append("language", "it");
-        formData.append("prompt", sttPadelPrompt);
         const resp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
           method: "POST",
           headers: { Authorization: `Bearer ${apiKey}` },
@@ -77,7 +91,7 @@ export default async function handler(req, res) {
       }
 
       const rawText = (tr.data?.text || "").trim();
-      if (!rawText) return null;
+      if (!rawText || isSilenceHallucination(rawText)) return null;
 
       return {
         id: clip.id,
@@ -92,7 +106,7 @@ export default async function handler(req, res) {
     const analyzed = trResults.filter(Boolean);
 
     if (analyzed.length === 0) {
-      return res.status(400).json({ error: "Nessun parlato rilevato nelle clip registrate" });
+      return res.status(400).json({ error: "Nessun parlato rilevato: avvicina il microfono e riprova." });
     }
 
     const moodGuide = {
@@ -101,26 +115,27 @@ export default async function handler(req, res) {
       calmo: "Calmo, disteso e analitico."
     }[mood] || "Sobrio, asciutto e naturale.";
 
-    // 2. Riscrittura FEDELE: pulisce e migliora leggermente senza aggiungere né togliere concetti
+    // 2. Riscrittura FEDELE: rifinisce solo ciò che dice il commentatore senza aggiungere altro
     const rewritePrompt = `Sei un editor di telecronaca TV di padel in italiano (${tournamentTitle}: ${team1} vs ${team2}).
 Ricevi una lista di appunti vocali ("rawText") dettati dal commentatore.
 
 COMPITO PRECISO (FEDELTÀ STRETTA):
-Devi solo RIPULIRE E RIFINIRE LEGGERMENTE la frase del commentatore per farla suonare fluida e professionale a voce, SENZA aggiungere altro e SENZA divagare.
-- ATTIENITI STRETTAMENTE a ciò che dice il commentatore in "rawText": non aggiungere commenti extra, non aggiungere valutazioni, non inventare dettagli, non allungare la frase.
-- NON aggiungere il punteggio se il commentatore non lo ha nominato; se lo ha nominato, assicurati solo che sia coerente con "scoreSnapshot" e scrivilo in lettere ("trenta a quindici", "quaranta pari").
-- NON togliere dettagli o colpi descritti dal commentatore: mantieni esattamente la sua descrizione, eliminando solo esitazioni ("ehm", "allora", "cioè", ripetizioni) e sistemando il ritmo con virgole o puntini ("...") per una lettura naturale.
-- Mantieni una lunghezza quasi identica alla frase originale.
+Rifinisci leggermente "rawText" per farlo suonare naturale e scorrevole da telecronaca TV, SENZA aggiungere altro e SENZA divagare.
+- Esempio: se "rawText" è "bandeja vincente Marco" -> restituisci "Grande bandeja vincente di Marco." (o "Bandeja vincente di Marco.").
+- ATTIENITI STRETTAMENTE a ciò che dice il commentatore: non aggiungere commenti extra, non inventare colpi o dettagli, non allungare la frase.
+- NON aggiungere il punteggio se il commentatore non lo ha nominato; se lo ha nominato, scrivilo in lettere ("trenta a quindici", "quaranta pari").
+- Se "rawText" sembra solo rumore o parole senza senso non legate alla partita, restituisci "text": "".
+- Elimina solo esitazioni ("ehm", "cioè", ripetizioni) e sistema la punteggiatura per una lettura fluida.
 - Mood: ${moodGuide} ZERO falsi entusiasmi, ZERO punti esclamativi inutili.
 
-GLOSSARIO PADEL (NON FRAINTENDERE MAI):
-- "per tre" / "x3" / "por tres" = smash fuori lateralmente sopra la parete da 3 metri (scrivi sempre "per tre", mai "x3", e mai "tre vincenti").
+GLOSSARIO PADEL (CORREGGI EVENTUALI ERRORI DI TRASCRIZIONE):
+- "per tre" / "x3" / "por tres" = smash fuori lateralmente sopra la parete da 3 metri (scrivi sempre "per tre", mai "x3" e mai "tre vincenti").
 - "per quattro" / "x4" / "por cuatro" = smash fuori dal vetro di fondo da 4 metri (scrivi sempre "per quattro", mai "x4").
-- Mantieni fedeli tutti i termini tecnici usati: bandeja, víbora, chiquita, bajada, rulo, gancho, dormilona, dejada, globo, contrapared, salida de pared, boquilla, reja, willy, tweener, nevera, punto de oro.
+- Correggi eventuali storpiature fonetiche nei termini del padel: bandeja, víbora, chiquita, bajada, rulo, gancho, dormilona, dejada, globo, contrapared, salida de pared, boquilla, reja, willy, tweener, nevera, punto de oro.
 
 Per ogni intervento restituisci:
 - "id": ESATTAMENTE lo stesso id ricevuto in input
-- "text": la frase leggermente rifinita, fedele al 100% a "rawText"
+- "text": la frase rifinita (oppure "" se non c'è vero parlato)
 - "tone": breve indicazione di registro coerente col mood (es. "calmo e scorrevole", "asciutto e attento")
 
 Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"...","tone":"..."}]}`;
@@ -153,13 +168,13 @@ Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"..."
     const rewrittenList = rawRewritten
       .map((item, idx) => ({
         id: (item && validIds.has(item.id)) ? item.id : (analyzed[idx]?.id || item?.id),
-        text: String(item?.text || analyzed[idx]?.rawText || "").trim(),
+        text: String(item?.text ?? "").trim(),
         tone: String(item?.tone || "calmo e scorrevole").trim()
       }))
-      .filter(item => item.id && item.text);
+      .filter(item => item.id && item.text.length > 0);
 
     if (rewrittenList.length === 0) {
-      return res.status(500).json({ error: "OpenAI ha restituito una riscrittura vuota" });
+      return res.status(400).json({ error: "Nessun commento valido rilevato nelle clip." });
     }
 
     const accentGuide = {
@@ -178,14 +193,13 @@ Rispondi SOLO con un JSON valido nel formato: {"clips":[{"id":"...","text":"..."
       const ttsInstructions = `${accentGuide}
 Stile: commentatore sportivo televisivo in cabina (stile Premier Padel), voce calda, viva e conversazionale, zero effetto robotico o da audiolibro.
 Ritmo: scorrevole e naturale, con micro-pause reali sui puntini e sulle virgole.
-PRONUNCIA CORRETTA DEI TERMINI PADEL (in spagnolo autentico):
-- "bandeja" si pronuncia "bandèha" (con la J aspirata spagnola, mai "bandegia")
-- "bajada" si pronuncia "bahàda" (con la J aspirata spagnola)
-- "reja" si pronuncia "rèha" (con la J aspirata spagnola)
+PRONUNCIA DEI TERMINI PADEL:
+- "bandeja" si pronuncia "bandèca" / "bandèha" (J aspirata spagnola, mai "bandegia")
+- "bajada" si pronuncia "bahàda"
+- "reja" si pronuncia "rèha"
 - "dejada" si pronuncia "dehàda"
 - "chiquita" si pronuncia "cikìta"
 - "víbora" si pronuncia "bìbora" (accento sulla prima sillaba)
-- "rulo", "gancho", "globo", "dormilona", "contrapared", "salida de pared" con cadenza spagnola naturale.
 ${pitchHint}
 Mood di questo intervento: ${item.tone}. Resta sempre sobrio e credibile: niente urla, niente entusiasmo finto.`;
 
@@ -199,6 +213,55 @@ Mood di questo intervento: ${item.tone}. Resta sempre sobrio e credibile: niente
           model: "gpt-4o-mini-tts",
           voice,
           speed: safeSpeed,
+          input: item.text,
+          instructions: ttsInstructions,
+          response_format: "mp3"
+        })
+      });
+
+      if (!ttsResp.ok) {
+        const err1 = await ttsResp.json().catch(() => ({}));
+        const fbVoice = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"].includes(voice) ? voice : "echo";
+        const fbResp = await fetch("https://api.openai.com/v1/audio/speech", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "tts-1",
+            voice: fbVoice,
+            speed: safeSpeed,
+            input: item.text,
+            response_format: "mp3"
+          })
+        });
+        if (fbResp.ok) {
+          ttsResp = fbResp;
+        } else {
+          const err2 = await fbResp.json().catch(() => ({}));
+          throw new Error(`TTS OpenAI: ${err1.error?.message || err2.error?.message || ttsResp.status}`);
+        }
+      }
+
+      const mp3Buf = Buffer.from(await ttsResp.arrayBuffer());
+      return {
+        id: item.id,
+        text: item.text,
+        tone: item.tone,
+        audioBase64: mp3Buf.toString("base64"),
+        audioMime: "audio/mpeg"
+      };
+    }
+
+    const outputClips = await Promise.all(rewrittenList.map(synthesizeClip));
+
+    return res.status(200).json({ clips: outputClips });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || "Errore interno" });
+  }
+}
+         speed: safeSpeed,
           input: item.text,
           instructions: ttsInstructions,
           response_format: "mp3"
